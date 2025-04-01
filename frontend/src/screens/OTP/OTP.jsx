@@ -3,7 +3,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const OTP = () => {
-  const length = 5;
+  const length = 6;
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
   const navigate = useNavigate();
