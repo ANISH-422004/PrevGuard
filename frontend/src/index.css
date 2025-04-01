@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Global Color Palette */
+:root {
+    --primary-color: #071952;
+    --secondary-color: #088395;
+    --light-background: #EBF4F6;
+    --accent-color: #37B7C3;
+  }
+  
+  /* Header (Primary Color) */
+  .header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem 1.5rem;
+  }
+  
+  .header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  /* Primary Button */
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--secondary-color);
+  }
+  
+  /* Secondary Button */
+  .btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--primary-color);
+  }
+  
+  /* Light Background Section */
+  .section-light {
+    background-color: var(--light-background);
+    color: var(--primary-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+  }
+  
+  /* Input Field */
+  .input-field {
+    background-color: var(--light-background);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  
+  .input-field:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 2px var(--secondary-color);
+  }
+  
+  /* Card with Hover Effect */
+  .card {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Link with Hover Effect */
+  .link {
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+  }
+  
+  .link:hover {
+    color: var(--secondary-color);
+  }
+  
+  /* Footer (Light Background) */
+  .footer {
+    background-color: var(--light-background);
+    color: var(--primary-color);
+    padding: 1rem 1.5rem;
+  }
+  
+  .footer p {
+    font-size: 0.875rem;
+  }
+  
