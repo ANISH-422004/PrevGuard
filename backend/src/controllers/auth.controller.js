@@ -59,7 +59,7 @@ module.exports.registerController = async (req, res) => {
 
     } catch (error) {
         console.log(error.message)
-        res.status(500).json({
+        res.status(400).json({
             errors: [error.message],
         })
     }

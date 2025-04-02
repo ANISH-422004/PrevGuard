@@ -2,8 +2,9 @@ const userModel = require("../models/user.model")
 
 module.exports.createUser = async ({ firstName, lastName, email, password, phoneNumber , OTP }) => {
     // Check if user already exists
-    const userExists = userModel.findOne({ email })
-    if (userExists == null) {
+    const userExists = await userModel.findOne({ email })
+    if (userExists) {
+        console.log(userExists)
         throw new Error('User already exists')
     }
     // Hash password
