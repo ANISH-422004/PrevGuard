@@ -1,12 +1,18 @@
 import { useState, useRef } from "react";
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import handelOTPverification from "./utility/handelOTPverification";
+import handelResendOTP from "./utility/handelResendOTP";
+import { useDispatch } from "react-redux";
 
 const OTP = () => {
   const length = 6;
   const [otp, setOtp] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
 
   const handleChange = (index, e) => {
     const value = e.target.value;
@@ -52,15 +58,41 @@ const OTP = () => {
           />
         ))}
       </div>
-      <button className="mt-6 px-6 py-2 bg-[#088395] text-[#EBF4F6] rounded-lg hover:bg-[#37B7C3] transition">
+      <div>
+        <h1 className="text-[#EBF4F6] text-xs font-light mt-4 text-center">
+          We Sent a OTP to Email and OTP will be valid for{" "}
+          <span className="text-orange-400"> 2 min </span> only !!
+        </h1>
+      </div>
+      <button
+        onClick={() => {
+          handelOTPverification(otp.join(""), location.state.email, navigate , dispatch);
+        }}
+        className="mt-6 px-6 py-2 bg-[#088395] text-[#EBF4F6] rounded-lg hover:bg-[#37B7C3] transition"
+      >
         Verify OTP
       </button>
       <p className="mt-4 text-[#EBF4F6]">
         Didn’t receive the OTP?{" "}
-        <span className="text-[#37B7C3] cursor-pointer hover:underline">
+        <span
+          onClick={() => handelResendOTP(location.state.email)}
+          className="text-[#37B7C3] cursor-pointer hover:underline hover:text-[#088395]"
+        >
           Resend OTP
         </span>
       </p>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import PasswordStrength from "./Register componets/PasswordStrength";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import axiosInstance from "../../config/axios/axios";
+import { ToastContainer, toast } from "react-toastify";
+import Loading from "../../components/Loading";
 
 const Register = () => {
+  const [errors, setErrors] = useState([]);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -13,6 +17,7 @@ const Register = () => {
     password: "",
     agree: false,
   });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
@@ -25,19 +30,101 @@ const Register = () => {
     });
   };
 
+  const handelRegisterUser = async (e) => {
+    setErrors([]);
+    setIsLoading(true);
+    try {
+      e.preventDefault();
+      // console.log(formData);
+      const { firstName, lastName, email, password, phoneNumber } = formData;
+      // Validate input
+      if (!firstName || !lastName || !email || !password || !phoneNumber) {
+        setErrors(["All fields are required"]);
+        toast.error("All fields are required", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        setIsLoading(false);
+        return;
+      }
+      if (!formData.agree) {
+        setErrors(["You must agree to the terms and conditions"]);
+        toast.error(errors[0], {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          // transition: Bounce,
+          });
+          setIsLoading(false);
+        return;
+      }
+
+      const response = await axiosInstance.post("api/auth/register", formData);
+
+      console.log(response);
+
+      if (response.status === 201) {
+        localStorage.setItem("token", response.data.token);
+        toast.success("User registered successfully Now Verify the Email" , {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        setTimeout(() => {
+          navigate("/otp" , { state: { email: formData.email } });
+        }, 1500);
+
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      const errorMessage = error.response?.data?.errors.join(", ") || "An error occurred";
+      setErrors([errorMessage]);
+      
+      toast.error(errors[0], {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        // transition: Bounce,
+        });
+        setIsLoading(false);
+    
+      }
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#071952] relative ">
+    <div className="flex p-4 items-center justify-center min-h-screen bg-[#071952] relative ">
       <div className="absolute top-1 left-1">
-      <button
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center text-[#37B7C3] mb-4"
         >
           <FaArrowLeft className="mr-2" /> Back
         </button>
       </div>
-      
-      <div className="w-96 p-3 bg-[#071952] rounded-lg ">
 
+      <div className="w-96 p-3 bg-[#071952] rounded-lg ">
         <h2 className="text-xl font-bold text-[#EBF4F6] mb-4">Sign Up</h2>
         <form>
           <div className="grid grid-cols-2 gap-2">
@@ -110,9 +197,19 @@ const Register = () => {
               <span className="text-[#088395]">policy</span>
             </label>
           </div>
-          <button className="w-full mt-4 p-2 bg-[#088395] text-[#EBF4F63 rounded-full hover:bg-[#37B7C3]">
-            Sign up
+          <button
+            onClick={(e) => {
+              handelRegisterUser(e);
+            }}
+            className="w-full mt-4 p-2 bg-[#088395] text-[#EBF4F63 rounded-full hover:bg-[#37B7C3]"
+          >
+            {isLoading ? (
+              <Loading/> ) : (
+              "Sign Up"
+              )  
+            }
           </button>
+          <ToastContainer />
         </form>
         <p className="text-[#EBF4F6] mt-4 text-center">
           Already have an account?{" "}
