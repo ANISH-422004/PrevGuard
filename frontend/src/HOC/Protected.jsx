@@ -27,9 +27,7 @@ const Protected = ({ children }) => {
     let isMounted = true; // Prevent state updates after unmount
 
     axiosInstance
-      .get("/api/auth/authme", {
-        headers: { Authorization: `Bearer ${token}` }, // Ensure token is sent
-      })
+      .get("/api/auth/authme")
       .then((res) => {
         if (isMounted) {
           dispatch(setUser(res.data.user));
