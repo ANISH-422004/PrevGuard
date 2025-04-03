@@ -73,7 +73,7 @@ const Register = () => {
 
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token);
-        toast.success("User registered successfully Now Verify the Email", {
+        toast.success("User registered successfully \n Now Verify the Email !!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -113,14 +113,7 @@ const Register = () => {
         darkTheme ? "bg-[#1A102B]" : "bg-[#F2F0FC]"
       }`}
     >
-      <div className="absolute top-1 left-1">
-        <button
-          onClick={() => navigate(-1)}
-          className={`flex items-center ${darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}`}
-        >
-          <FaArrowLeft className="mr-2" /> Back
-        </button>
-      </div>
+
 
       <div
         className={`w-96 p-3 rounded-lg ${
@@ -130,7 +123,7 @@ const Register = () => {
         <h2 className={`text-xl font-bold mb-4 ${darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"}`}>
           Sign Up
         </h2>
-        <form>
+        <form className=""> 
           <div className="grid grid-cols-2 gap-2">
             <input
               type="text"

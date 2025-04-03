@@ -8,7 +8,7 @@ import { PiSignInDuotone } from "react-icons/pi";
 import { useSelector } from "react-redux";
 const NavBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const user = false; // Replace with actual auth logic
+  const user = useSelector((state) => state.user.user); // Replace with actual auth logic
   const { darkTheme } = useSelector((state) => state.theme); // Assuming you have a theme slice in your Redux store
 
   return (
@@ -25,7 +25,13 @@ const NavBar = () => {
           </button>
 
           {/* Logo */}
-          <img src={Logo} alt="PrevGuard Logo" className="h-7 md:h-8 lg:h-10" />
+          <Link to={"/"}>
+            <img
+              src={Logo}
+              alt="PrevGuard Logo"
+              className="h-7 md:h-8 lg:h-10"
+            />
+          </Link>
         </div>
 
         {/* Center Section: Page Title (Hidden on Small Screens) */}
@@ -43,7 +49,7 @@ const NavBar = () => {
           {user ? (
             <Link to="/profile">
               <img
-                src="https://via.placeholder.com/40" // Replace with real user image
+                src={user.profilePicture} // Replace with real user image
                 alt="Profile"
                 className="h-7 w-7 md:h-8 md:w-8 lg:h-10 lg:w-10 rounded-full border border-light-accent dark:border-dark-accent cursor-pointer hover:scale-105 transition"
               />
@@ -57,13 +63,11 @@ const NavBar = () => {
                 New? here!
               </Link>
               <Link to="/login" className="">
-
-                  <PiSignInDuotone
-                    className={`inline-block h-8 w-8 rounded-full ${
-                      darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"
-                    }`}
-                  />
-              
+                <PiSignInDuotone
+                  className={`inline-block h-8 w-8 rounded-full ${
+                    darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"
+                  }`}
+                />
               </Link>
             </div>
           )}

@@ -1,49 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axiosInstance from "../config/axios/axios";
 import { useDispatch } from "react-redux";
 import { setUser } from "../app/slices/userSlice";
+import Unauthorized from "../components/Unauthorized";
+import { useNavigate } from "react-router-dom";
+import LoadingScreen from "../components/LoadingScreen/LoadingScreen";
 
 const Protected = ({ children }) => {
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
-    console.log(token)
+  const navigate = useNavigate();
+  
+  const [isAuthorized, setIsAuthorized] = useState(false); // Default to false
+  const [isLoading, setIsLoading] = useState(true); // Separate loading state
 
-  if (!token) {
-    toast.error("Unauthorized! Redirecting to login...");
-    setTimeout(() => {
-      window.location.href = "/";
-    }, 500);
-  }
 
-  axiosInstance
-    .get("api/user/getuser")
-    .then((res) => {
-      console.log(res.data);
-      dispatch(setUser(res.data.user));
-    })
-    .catch((err) => {
-      console.log(err.response?.data?.errors?.[0] || "An error occurred");
-      toast.error(
-        err.response?.data?.errors?.[0] + " Try logging in again" ||
-          "An error occurred",
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        }
-      );
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 500);
-    });
+  useEffect(() => {
+  console.log(token)
 
-  return children;
+    if (!token) {
+      toast.error("Unauthorized! Redirecting to login...");
+      setTimeout(() => navigate("/"), 500);
+      setIsAuthorized(false);
+      setIsLoading(false); // Stop loading
+      return;
+    }
+
+    axiosInstance
+      .get("/api/auth/authme")
+      .then((res) => {
+        dispatch(setUser(res.data.user));
+        setIsAuthorized(true);
+      })
+      .catch((err) => {
+        toast.error(
+          err.response?.data?.errors?.[0] + " Try logging in again" || "An error occurred",
+          { position: "top-right", autoClose: 3000 }
+        );
+        console.log(err);
+        setTimeout(() => navigate("/"), 500);
+        setIsAuthorized(false);
+      })
+      .finally(() => setIsLoading(false)); // Ensure loading stops after API response
+  }, [token, dispatch]);
+
+  if (isLoading) return <LoadingScreen />; // Show loading screen while checking auth
+  if (!isAuthorized) return <Unauthorized />; // Show unauthorized screen if access is denied
+  
+  return children; // Render children if authorized
 };
 
 export default Protected;

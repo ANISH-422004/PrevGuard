@@ -45,6 +45,18 @@
         verificationTokenExpiresAt: {
             type: Date,
         },
+        sharedData: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'SharedData',
+        }],
+        savedFakeData: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'FakeData',
+        }],
+        breachAlerts: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'BreachAlert',
+        }]
 
     }, { timestamps: true });
 

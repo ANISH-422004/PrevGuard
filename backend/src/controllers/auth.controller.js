@@ -64,3 +64,73 @@ module.exports.registerController = async (req, res) => {
         })
     }
 }
+
+module.exports.authMe = async (req, res) => {
+  try {
+      const user = req.user; // Assuming user is set in the request by authentication middleware
+
+      if (!user) {
+          return res.status(404).json({ errors: ["User not found"] });
+      }
+
+      // Exclude sensitive information
+      user.password = undefined;
+      user.verificationToken = undefined;
+      user.verificationTokenExpiresAt = undefined;
+
+      res.status(200).json({
+          message: "User fetched successfully",
+          user,
+      });
+
+
+  } catch (error) {
+      
+      console.error(error);
+      res.status(500).json({ errors: ["Internal server error"] });
+  }
+
+
+}
+
+module.exports.loginController = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({
+                errors: ['All fields are required'],
+            })
+        }
+
+        // Find user by email
+        const user = await userModel.findOne({ email })
+        if (!user) {
+            return res.status(404).json({
+                errors: ['User not found'],
+            })
+        }
+
+        // Check password
+        if (!user.comparePassword(password)) {
+            return res.status(401).json({
+                errors: ['Invalid password'],
+            })
+        }
+        // Generate token
+        const token = userModel.generateToken(user)
+
+        // Send response
+        res.status(200).json({
+            message: 'User logged in successfully',
+            user,
+            token,
+        })
+
+    } catch (error) {
+        console.log(error.message)
+        res.status(400).json({
+            errors: [error.message],
+        })
+    }
+}
