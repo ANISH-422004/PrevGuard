@@ -1,66 +1,76 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MoreVertical } from "lucide-react";
-
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { HiMenu } from "react-icons/hi"; // Sidebar toggle icon
+import ThemeButton from "../../components/ThemeButton";
+import Logo from "../../assets/PrevGuard.svg"; // Your logo
+import SideBar from "../SideBar/SideBar";
+import { PiSignInDuotone } from "react-icons/pi";
+import { useSelector } from "react-redux";
 const NavBar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
-
-  const toggleMenu = () => setIsOpen(!isOpen);
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const user = false; // Replace with actual auth logic
+  const { darkTheme } = useSelector((state) => state.theme); // Assuming you have a theme slice in your Redux store
 
   return (
-    <nav className="relative flex justify-between items-center p-4 bg-[#071952] text-white shadow-md">
-      <div className="text-lg font-bold">Prev Guard</div>
-      
-      <button onClick={toggleMenu} className="focus:outline-none">
-        <MoreVertical size={24} />
-      </button>
-      
-      {/* Overlay */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black backdrop-blur-sm"
-          ></motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Sidebar Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            ref={menuRef}
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.3 }}
-            className="fixed top-0 right-0 h-full w-64 bg-white text-black shadow-lg p-6 flex flex-col space-y-4"
+    <>
+      <nav className="top-0 left-0 w-full bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-lg shadow-md flex justify-between items-center px-3 py-2 md:px-4 md:py-3 lg:p-4 z-50 ">
+        {/* Left Section: Sidebar Toggle & Logo */}
+        <div className="flex items-center gap-2 md:gap-4">
+          {/* Sidebar Toggle Button - prop drilled */}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="text-light-primaryText dark:text-dark-primaryText text-lg md:text-xl lg:text-2xl hover:text-light-accent dark:hover:text-dark-accent transition"
           >
-            <button onClick={toggleMenu} className="self-end text-gray-600">✖</button>
-            <a href="/" className="text-lg hover:text-blue-500">Home</a>
-            <a href="#" className="text-lg hover:text-blue-500">Profile</a>
-            <a href="#" className="text-lg hover:text-blue-500">Settings</a>
-            <a href="#" className="text-lg hover:text-red-500">Logout</a>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+            <HiMenu />
+          </button>
+
+          {/* Logo */}
+          <img src={Logo} alt="PrevGuard Logo" className="h-7 md:h-8 lg:h-10" />
+        </div>
+
+        {/* Center Section: Page Title (Hidden on Small Screens) */}
+        <Link
+          to={"/"}
+          className="hidden md:block text-lg lg:text-xl font-semibold text-light-primaryText dark:text-dark-primaryText"
+        >
+          PrevGuard
+        </Link>
+
+        {/* Right Section: Theme Toggle + Profile/Login */}
+        <div className="flex items-center gap-2 md:gap-4">
+          <ThemeButton />
+
+          {user ? (
+            <Link to="/profile">
+              <img
+                src="https://via.placeholder.com/40" // Replace with real user image
+                alt="Profile"
+                className="h-7 w-7 md:h-8 md:w-8 lg:h-10 lg:w-10 rounded-full border border-light-accent dark:border-dark-accent cursor-pointer hover:scale-105 transition"
+              />
+            </Link>
+          ) : (
+            <div className="flex  gap-2 items-center">
+              <Link
+                to="/register"
+                className="text-xs md:text-sm text-light-primaryText dark:text-dark-primaryText hover:text-light-accent dark:hover:text-dark-accent mt-1 transition"
+              >
+                New? here!
+              </Link>
+              <Link to="/login" className="">
+
+                  <PiSignInDuotone
+                    className={`inline-block h-8 w-8 rounded-full ${
+                      darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"
+                    }`}
+                  />
+              
+              </Link>
+            </div>
+          )}
+        </div>
+      </nav>
+      <SideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import axiosInstance from "../../config/axios/axios";
 import { ToastContainer, toast } from "react-toastify";
 import Loading from "../../components/Loading";
+import { useSelector } from "react-redux";
 
 const Register = () => {
   const [errors, setErrors] = useState([]);
@@ -19,6 +20,7 @@ const Register = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { darkTheme } = useSelector((state) => state.theme);
 
   const togglePasswordVisibility = () => setPasswordVisible(!passwordVisible);
 
@@ -35,9 +37,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       e.preventDefault();
-      // console.log(formData);
       const { firstName, lastName, email, password, phoneNumber } = formData;
-      // Validate input
       if (!firstName || !lastName || !email || !password || !phoneNumber) {
         setErrors(["All fields are required"]);
         toast.error("All fields are required", {
@@ -64,19 +64,16 @@ const Register = () => {
           draggable: true,
           progress: undefined,
           theme: "light",
-          // transition: Bounce,
-          });
-          setIsLoading(false);
+        });
+        setIsLoading(false);
         return;
       }
 
       const response = await axiosInstance.post("api/auth/register", formData);
 
-      console.log(response);
-
       if (response.status === 201) {
         localStorage.setItem("token", response.data.token);
-        toast.success("User registered successfully Now Verify the Email" , {
+        toast.success("User registered successfully Now Verify the Email", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -87,16 +84,15 @@ const Register = () => {
           theme: "light",
         });
         setTimeout(() => {
-          navigate("/otp" , { state: { email: formData.email } });
+          navigate("/otp", { state: { email: formData.email } });
         }, 1500);
-
       }
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
-      const errorMessage = error.response?.data?.errors.join(", ") || "An error occurred";
+      const errorMessage =
+        error.response?.data?.errors.join(", ") || "An error occurred";
       setErrors([errorMessage]);
-      
+
       toast.error(errors[0], {
         position: "top-right",
         autoClose: 5000,
@@ -106,26 +102,34 @@ const Register = () => {
         draggable: true,
         progress: undefined,
         theme: "light",
-        // transition: Bounce,
-        });
-        setIsLoading(false);
-    
-      }
+      });
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="flex p-4 items-center justify-center min-h-screen bg-[#071952] relative ">
+    <div
+      className={`flex p-4 items-center justify-center min-h-screen relative ${
+        darkTheme ? "bg-[#1A102B]" : "bg-[#F2F0FC]"
+      }`}
+    >
       <div className="absolute top-1 left-1">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center text-[#37B7C3] mb-4"
+          className={`flex items-center ${darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}`}
         >
           <FaArrowLeft className="mr-2" /> Back
         </button>
       </div>
 
-      <div className="w-96 p-3 bg-[#071952] rounded-lg ">
-        <h2 className="text-xl font-bold text-[#EBF4F6] mb-4">Sign Up</h2>
+      <div
+        className={`w-96 p-3 rounded-lg ${
+          darkTheme ? "bg-[#221736]" : "bg-[#DCD6F7]"
+        }`}
+      >
+        <h2 className={`text-xl font-bold mb-4 ${darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"}`}>
+          Sign Up
+        </h2>
         <form>
           <div className="grid grid-cols-2 gap-2">
             <input
@@ -134,7 +138,9 @@ const Register = () => {
               value={formData.firstName}
               onChange={handleChange}
               placeholder="First Name"
-              className="w-full p-2 rounded-full border border-[#37B7C3] bg-transparent text-[#EBF4F6] focus:border-gray-500"
+              className={`w-full p-2 rounded-full border ${
+                darkTheme ? "border-[#874CCC] text-[#E3DFFD]" : "border-[#874CCC] text-[#241847]"
+              } bg-transparent`}
             />
             <input
               type="text"
@@ -142,7 +148,9 @@ const Register = () => {
               value={formData.lastName}
               onChange={handleChange}
               placeholder="Last Name"
-              className="w-full p-2 rounded-full border border-[#37B7C3] bg-transparent text-[#EBF4F6] focus:border-gray-500"
+              className={`w-full p-2 rounded-full border ${
+                darkTheme ? "border-[#874CCC] text-[#E3DFFD]" : "border-[#874CCC] text-[#241847]"
+              } bg-transparent`}
             />
           </div>
           <input
@@ -151,7 +159,9 @@ const Register = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Email"
-            className="w-full mt-3 p-2 rounded-full border border-[#37B7C3] bg-transparent text-[#EBF4F6] focus:border-gray-500"
+            className={`w-full mt-3 p-2 rounded-full border ${
+              darkTheme ? "border-[#874CCC] text-[#E3DFFD]" : "border-[#874CCC] text-[#241847]"
+            } bg-transparent`}
           />
           <input
             type="text"
@@ -159,7 +169,9 @@ const Register = () => {
             value={formData.phoneNumber}
             onChange={handleChange}
             placeholder="Phone Number"
-            className="w-full mt-3 p-2 rounded-full border border-[#37B7C3] bg-transparent text-[#EBF4F6] focus:border-gray-500"
+            className={`w-full mt-3 p-2 rounded-full border ${
+              darkTheme ? "border-[#874CCC] text-[#E3DFFD]" : "border-[#874CCC] text-[#241847]"
+            } bg-transparent`}
           />
           <div className="relative mt-3">
             <input
@@ -168,17 +180,17 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
-              className="w-full p-2 rounded-full border border-[#37B7C3] bg-transparent text-[#EBF4F6] focus:border-gray-500"
+              className={`w-full p-2 rounded-full border ${
+                darkTheme ? "border-[#874CCC] text-[#E3DFFD]" : "border-[#874CCC] text-[#241847]"
+              } bg-transparent`}
             />
             <span
               onClick={togglePasswordVisibility}
-              className="absolute right-3 top-2 text-[#37B7C3] cursor-pointer"
+              className={`absolute right-3 top-2 cursor-pointer ${darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}`}
             >
               {passwordVisible ? "Hide" : "Show"}
             </span>
           </div>
-
-          {/* Strong strength Meter */}
 
           <PasswordStrength password={formData.password} />
 
@@ -191,29 +203,26 @@ const Register = () => {
               onChange={handleChange}
               className="mr-2"
             />
-
-            <label htmlFor="agree" className="text-[#EBF4F6]">
-              I Agree with <span className="text-[#088395]">privacy</span> and{" "}
-              <span className="text-[#088395]">policy</span>
+            <label htmlFor="agree" className={darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"}>
+              I Agree with <span className={darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}>privacy</span> and{" "}
+              <span className={darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}>policy</span>
             </label>
           </div>
           <button
             onClick={(e) => {
               handelRegisterUser(e);
             }}
-            className="w-full mt-4 p-2 bg-[#088395] text-[#EBF4F63 rounded-full hover:bg-[#37B7C3]"
+            className={`w-full mt-4 p-2 rounded-full ${
+              darkTheme ? "bg-[#A66CFF] text-[#E3DFFD]" : "bg-[#A66CFF] text-[#241847]"
+            }`}
           >
-            {isLoading ? (
-              <Loading/> ) : (
-              "Sign Up"
-              )  
-            }
+            {isLoading ? <Loading /> : "Sign Up"}
           </button>
           <ToastContainer />
         </form>
-        <p className="text-[#EBF4F6] mt-4 text-center">
+        <p className={`mt-4 text-center ${darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"}`}>
           Already have an account?{" "}
-          <a href="/login" className="text-[#37B7C3]">
+          <a href="/login" className={darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}>
             Sign in
           </a>
         </p>

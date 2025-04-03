@@ -7,15 +7,15 @@ import { toggleTheme } from "../app/slices/ThemeSlice";
 const ThemeButton = () => {
   const { darkTheme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
-  console.log(darkTheme);
   
+  console.log("Dark theme status:", darkTheme); // Debugging log
   
   return (
     <button
       onClick={() => {
         dispatch(toggleTheme())
       }}
-      className={`rounded-full  transition-all duration-150  bg-${darkTheme ? "black" : "white"} text-${
+      className={`rounded-full  transition-all duration-300  bg-${darkTheme ? "black" : "white"} text-${
         darkTheme ? "white" : "black"
       } p-2`}
     >
