@@ -8,47 +8,55 @@ import { useNavigate } from "react-router-dom";
 import LoadingScreen from "../components/LoadingScreen/LoadingScreen";
 
 const Protected = ({ children }) => {
-  const token = localStorage.getItem("token");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
-  const [isAuthorized, setIsAuthorized] = useState(false); // Default to false
-  const [isLoading, setIsLoading] = useState(true); // Separate loading state
-
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-  console.log(token)
+    const token = localStorage.getItem("token"); // Get token inside useEffect
 
     if (!token) {
       toast.error("Unauthorized! Redirecting to login...");
       setTimeout(() => navigate("/"), 500);
       setIsAuthorized(false);
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
       return;
     }
 
+    let isMounted = true; // Prevent state updates after unmount
+
     axiosInstance
-      .get("/api/auth/authme")
+      .get("/api/auth/authme", {
+        headers: { Authorization: `Bearer ${token}` }, // Ensure token is sent
+      })
       .then((res) => {
-        dispatch(setUser(res.data.user));
-        setIsAuthorized(true);
+        if (isMounted) {
+          dispatch(setUser(res.data.user));
+          setIsAuthorized(true);
+        }
       })
       .catch((err) => {
-        toast.error(
-          err.response?.data?.errors?.[0] + " Try logging in again" || "An error occurred",
-          { position: "top-right", autoClose: 3000 }
-        );
-        console.log(err);
-        setTimeout(() => navigate("/"), 500);
-        setIsAuthorized(false);
+        if (isMounted) {
+          const errorMessage = err.response?.data?.message || "An error occurred. Try logging in again.";
+          toast.error(errorMessage, { position: "top-right", autoClose: 3000 });
+          setTimeout(() => navigate("/"), 500);
+          setIsAuthorized(false);
+        }
       })
-      .finally(() => setIsLoading(false)); // Ensure loading stops after API response
-  }, [token, dispatch]);
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
 
-  if (isLoading) return <LoadingScreen />; // Show loading screen while checking auth
-  if (!isAuthorized) return <Unauthorized />; // Show unauthorized screen if access is denied
-  
-  return children; // Render children if authorized
+    return () => {
+      isMounted = false; // Cleanup function
+    };
+  }, [dispatch, navigate]);
+
+  if (isLoading) return <LoadingScreen />; 
+  if (!isAuthorized) return <Unauthorized />;
+
+  return children;
 };
 
 export default Protected;
