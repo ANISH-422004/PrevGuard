@@ -20,7 +20,6 @@ const Login = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  console.log(formData)
 
   const handleLogin = async (e) => {
     e.preventDefault(); // FIX: Prevent default form submission

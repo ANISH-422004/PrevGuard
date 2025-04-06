@@ -1,15 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { HiMenu } from "react-icons/hi"; // Sidebar toggle icon
 import ThemeButton from "../../components/ThemeButton";
 import Logo from "../../assets/PrevGuard.svg"; // Your logo
 import SideBar from "../SideBar/SideBar";
 import { PiSignInDuotone } from "react-icons/pi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import axiosInstance from "../../config/axios/axios";
+import { setUser } from "../../app/slices/userSlice";
 const NavBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const user = useSelector((state) => state.user.user); // Replace with actual auth logic
   const { darkTheme } = useSelector((state) => state.theme); // Assuming you have a theme slice in your Redux store
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const isUserLoggedIn = async () => {
+      axiosInstance
+        .get("/api/auth/authme")
+        .then((res) => {
+          dispatch(setUser(res.data.user));
+        })
+        .catch((e) => {
+          console.log(e);
+          dispatch(setUser(null));
+        });
+    };
+    isUserLoggedIn();
+  }, []);
 
   return (
     <>
