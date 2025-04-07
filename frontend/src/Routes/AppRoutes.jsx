@@ -6,6 +6,8 @@ import Login from "../screens/Login/Login";
 import OTP from "../screens/OTP/OTP";
 import Dashboard from "../screens/Dashboard/Dashboard";
 import Protected from "../HOC/Protected";
+import Vault from "../screens/vault/Vault";
+
 
 const AppRoutes = () => {
   return (
@@ -22,7 +24,13 @@ const AppRoutes = () => {
           </Protected>
         }
       />
-      {/* Add more routes as needed */}
+      <Route path="/vault"
+        element={
+          <Protected>
+            <Vault />
+          </Protected>
+        }
+      />
     </Routes>
   );
 };
