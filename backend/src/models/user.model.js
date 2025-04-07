@@ -29,6 +29,10 @@
             type: String,
             default: "https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg",
         },
+        vaultSalt: {
+            type: String,
+            required: false, // Only required once they use the vault
+          },
         isVerified: {
             type: Boolean,
             default: false,

@@ -1,4 +1,6 @@
+const crypto = require("crypto");
 const VaultItem = require("../models/vaultitems.model");
+const userModel = require("../models/user.model");
 
 module.exports.getVault = async(req,res)=>{
     try {
@@ -94,3 +96,35 @@ module.exports.deleteVault = async(req,res)=>{
         
     }
 }
+
+
+module.exports.getSalt = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await userModel.findById(userId);
+    if (!user || !user.vaultSalt) {
+      return res.status(404).json({ error: "Salt not found" });
+    }
+    return res.status(200).json({ salt: user.vaultSalt });
+  } catch (error) {
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+
+
+module.exports.generateSalt = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const salt = crypto.randomBytes(16).toString("hex");
+
+    const user = await userModel.findByIdAndUpdate(userId, {
+      vaultSalt: salt,
+    }, { new: true });
+
+    return res.status(200).json({ salt: user.vaultSalt });
+  } catch (err) {
+    return res.status(500).json({ error: "Server error" });
+  }
+};
