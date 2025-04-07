@@ -5,7 +5,7 @@ const app = express();
 const authRoutes = require('./routes/auth.routes');
 const OTPRoutes = require('./routes/otp.routes');
 const userRoutes = require('./routes/user.routes');
-
+const vaultRoutes = require('./routes/vault.routes');
 
 // Middleware
 app.use(morgan('dev'));
@@ -28,6 +28,13 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/otp', OTPRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/vault', vaultRoutes);
+
+
+// 404 Handler
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Not Found' });
+});
 
 
 
