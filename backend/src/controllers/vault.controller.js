@@ -8,7 +8,7 @@ module.exports.getVault = async(req,res)=>{
             if (!userId) {
                 return res.status(400).json({ errors: ["User ID is required"] });
             }
-            const vaultItems = await VaultItem.find({ userId }).sort({ createdAt: -1 });
+            const vaultItems = await VaultItem.find({ userId, isDummy: { $ne: true } }).sort({ createdAt: -1 });
             if (!vaultItems) {
                 return res.status(404).json({ errors: ["No vault items found"] });
             }
@@ -25,7 +25,7 @@ module.exports.getVault = async(req,res)=>{
 
 module.exports.addVault = async(req,res)=>{
     try {
-        const { encryptedData  , title} = req.body;
+        const { encryptedData  , title , isDummy} = req.body;
         const userId = req.user._id;
         if (!userId) {
             return res.status(400).json({ errors: ["Unauthorized"] });
@@ -37,6 +37,7 @@ module.exports.addVault = async(req,res)=>{
             userId,
             encryptedData,
             title,
+            isDummy,
 
         });
 
@@ -128,3 +129,17 @@ module.exports.generateSalt = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+
+
+module.exports.getDummy =  async (req, res) => {
+    try {
+        console.log(req.user._id)
+      const dummyItem = await VaultItem.findOne({ userId: req.user._id, isDummy: true });
+      if (!dummyItem) return res.status(404).json({ message: "Dummy item not found" });
+  
+      res.json(dummyItem);
+    } catch (error) {
+      console.error("Failed to fetch dummy:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  }

@@ -11,15 +11,19 @@ const VaultItemSchema = new mongoose.Schema({
         required: true,
     },
     encryptedData: {
-      type: String,
-      required: true,
+      iv: String,
+      data: String
+    },
+    isDummy: {
+      type: Boolean,
+      default: false,
     },
 
   }, {
     timestamps: true,
   });
 
-  
+
 const VaultItem = mongoose.model('VaultItem', VaultItemSchema);
 
 
