@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
-import useVaultSalt from "./hooks/useVaultSalt";
+import { useIsFirstTimeUser } from "./hooks/useIsFirstTimeUser";
+import VaultSetupModal from "../../components/VaultSetupModal/VaultSetupModal";
+import VaultUnlockModal from "../../components/VaultUnlockModal/VaultUnlockModal";
+import { useNavigate } from "react-router-dom";
 
 const Vault = () => {
-  const { salt, loading } = useVaultSalt(); // <-- use the hook
-  const [password, setPassword] = useState("");
-  const [unlocked, setUnlocked] = useState(false);
-
   const darkTheme = useSelector((state) => state.theme.darkTheme);
+  const navigate = useNavigate();
+  const { isFirstTimeUser, loading } = useIsFirstTimeUser();
+  const [password, setPassword] = useState("");
+  const [unlocked, setUnlocked] = useState(false); // Controls Vault access
+  const [showUnlockModal, setShowUnlockModal] = useState(false); // Controls modal visibility
+  
+
 
   const handleUnlock = (e) => {
     e.preventDefault();
@@ -21,6 +27,12 @@ const Vault = () => {
     }
   };
 
+  useEffect(() => {
+    if (!loading && !isFirstTimeUser && !unlocked) {
+      setShowUnlockModal(true);
+    }
+  }, [loading, isFirstTimeUser, unlocked]);
+
   if (loading) return <LoadingScreen />;
 
   return (
@@ -31,78 +43,64 @@ const Vault = () => {
           : "bg-light-background text-light-primaryText"
       }`}
     >
-      {!unlocked ? (
-        <form
-          onSubmit={handleUnlock}
-          className={`w-full max-w-sm p-6 rounded-2xl shadow-lg space-y-4 ${
-            darkTheme
-              ? "bg-dark-secondary border border-dark-hover"
-              : "bg-light-secondary border border-light-hover"
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-semibold">🔓 Vault Access Granted</h1>
+        <p
+          className={`${
+            darkTheme ? "text-dark-secondaryText" : "text-light-secondaryText"
           }`}
         >
-          <h2 className="text-2xl font-bold text-center">
-            🔐 Enter Vault Password
-          </h2>
-          <input
-            type="password"
-            placeholder="Vault Password"
-            className={`w-full p-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-dark-accent ${
-              darkTheme
-                ? "bg-dark-background border-dark-hover placeholder-dark-secondaryText text-dark-primaryText"
-                : "bg-light-background border-light-hover placeholder-light-secondaryText text-light-primaryText"
-            }`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="w-full bg-dark-action text-white py-2 rounded-xl hover:bg-dark-hover transition-all"
-          >
-            Unlock
-          </button>
-        </form>
-      ) : (
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold">🔓 Vault Access Granted</h1>
-          <p
-            className={`${
-              darkTheme ? "text-dark-secondaryText" : "text-light-secondaryText"
-            }`}
-          >
-            Welcome to your secured Vault!
-          </p>
-          <div className="grid gap-4 mt-6">
-            {[
-              { app: "Google", password: "mySecret123" },
-              { app: "Facebook", password: "passw0rd!" },
-              { app: "Twitter", password: "qwerty12345" },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className={`p-4 rounded-xl shadow-md flex justify-between items-center ${
-                  darkTheme
-                    ? "bg-dark-secondary text-dark-primaryText"
-                    : "bg-light-secondary text-light-primaryText"
-                }`}
-              >
-                <div>
-                  <h3 className="font-semibold">{item.app}</h3>
-                  <p className="font-mono text-sm">••••••••••••</p>
-                </div>
-                <button
-                  className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                    darkTheme
-                      ? "bg-dark-accent text-white hover:bg-dark-hover"
-                      : "bg-light-accent text-white hover:bg-light-hover"
-                  } transition`}
-                >
-                  Copy
-                </button>
+          Welcome to your secured Vault!
+        </p>
+        <div className="grid gap-4 mt-6">
+          {[
+            { app: "Google", password: "mySecret123" },
+            { app: "Facebook", password: "passw0rd!" },
+            { app: "Twitter", password: "qwerty12345" },
+          ].map((item, index) => (
+            <div
+              key={index}
+              className={`p-4 rounded-xl shadow-md flex justify-between items-center ${
+                darkTheme
+                  ? "bg-dark-secondary text-dark-primaryText"
+                  : "bg-light-secondary text-light-primaryText"
+              }`}
+            >
+              <div>
+                <h3 className="font-semibold">{item.app}</h3>
+                <p className="font-mono text-sm">••••••••••••</p>
               </div>
-            ))}
-          </div>
+              <button
+                className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                  darkTheme
+                    ? "bg-dark-accent text-white hover:bg-dark-hover"
+                    : "bg-light-accent text-white hover:bg-light-hover"
+                } transition`}
+              >
+                Copy
+              </button>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
+
+      {/* Vault Setup Modal for first-time users */}
+      {isFirstTimeUser ? <VaultSetupModal isOpen={true} /> : null}
+
+      {/* Unlock Vault Form */}
+      <VaultUnlockModal
+        isOpen={showUnlockModal}
+        onSuccess={() => {
+          setUnlocked(true);
+          setShowUnlockModal(false);
+          toast.success("🔓 Vault unlocked!");
+        }}
+        onCancel={() => {
+          toast.info("Vault unlock cancelled. Redirecting...");
+          navigate("/dashboard");
+          setShowUnlockModal(false);
+        }}
+      />
     </div>
   );
 };

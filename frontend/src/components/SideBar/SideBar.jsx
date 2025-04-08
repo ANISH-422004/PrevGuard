@@ -38,42 +38,49 @@ const SideBar = ({ isOpen, onClose }) => {
         {/* Navigation Links */}
         <nav className="flex flex-col gap-4 p-4 text-white dark:text-dark-primaryText">
           <Link
+            onClick={onClose}
             to="/dashboard"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
             Dashboard
           </Link>
           <Link
+            onClick={onClose}
             to="/profile"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
             Profile
           </Link>
           <Link
+            onClick={onClose}
             to="/shared-data"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
             Shared Data
           </Link>
           <Link
+            onClick={onClose}
             to="/fake-data"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
             Fake Data Generator
           </Link>
           <Link
+            onClick={onClose}
             to="/breach-check"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
             Breach Monitoring
           </Link>
           <Link
+            onClick={onClose}
             to="/privacy-tips"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
             Privacy Tips
           </Link>
           <Link
+            onClick={onClose}
             to="/vault"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
