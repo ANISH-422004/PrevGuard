@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { IoMdAdd } from "react-icons/io";
 import axiosInstance from "../../config/axios/axios";
 import AddPasswordModal from "../../components/AddPasswordModal";
+import DeleteConfirmModal from "../../components/DeleteConfirmModal";
 
 const Vault = () => {
   const darkTheme = useSelector((state) => state.theme.darkTheme);
@@ -14,6 +15,27 @@ const Vault = () => {
   const [vaultItems, setVaultItems] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  const handleDeleteClick = (itemId) => {
+    setItemToDelete(itemId);
+    setShowDeleteModal(true);
+  };
+
+  console.log(itemToDelete)
+  const confirmDelete = async () => {
+    try {
+      await axiosInstance.delete(`/api/vault/delete/${itemToDelete}`);
+      setVaultItems((prev) => prev.filter((item) => item._id !== itemToDelete));
+      toast.success("Deleted successfully");
+    } catch (err) {
+      toast.error("Failed to delete");
+    } finally {
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+    }
+  };
 
   const toggleVisibility = (index) => {
     setVisibleIndex(index === visibleIndex ? null : index);
@@ -38,20 +60,6 @@ const Vault = () => {
     fetchVaultItems();
   }, []);
 
-  const handleDelete = async (id) => {
-    try {
-      await axiosInstance.delete(`/api/vault/delete/${id}`);
-      setVaultItems((prev) => prev.filter((item) => item._id !== id));
-      toast.success("Password deleted 🗑️");
-      setVaultItems(prev => prev.filter(item => item._id !== id))
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete password");
-    }
-  };
-  
-
-  // if (loading) return <LoadingScreen />;
 
   return (
     <div
@@ -93,6 +101,16 @@ const Vault = () => {
           />
         )}
 
+        <DeleteConfirmModal
+          isOpen={showDeleteModal}
+          onConfirm={confirmDelete}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+          }}
+        />
+
+        {/* mapping */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 w-full max-w-6xl mx-auto">
           {vaultItems.map((item, index) => (
             <div
@@ -134,7 +152,7 @@ const Vault = () => {
                 </button>
 
                 <button
-                  onClick={() => handleDelete(item._id)}
+                  onClick={() => handleDeleteClick(item._id)}
                   className={`p-1 rounded-md ${
                     darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
                   } transition`}
