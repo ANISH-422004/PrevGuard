@@ -1,39 +1,57 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
-import { useIsFirstTimeUser } from "./hooks/useIsFirstTimeUser";
-import VaultSetupModal from "../../components/VaultSetupModal/VaultSetupModal";
-import VaultUnlockModal from "../../components/VaultUnlockModal/VaultUnlockModal";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Copy, Eye, EyeOff, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import { IoMdAdd } from "react-icons/io";
+import axiosInstance from "../../config/axios/axios";
+import AddPasswordModal from "../../components/AddPasswordModal";
 
 const Vault = () => {
   const darkTheme = useSelector((state) => state.theme.darkTheme);
   const navigate = useNavigate();
-  const { isFirstTimeUser, loading } = useIsFirstTimeUser();
-  const [password, setPassword] = useState("");
-  const [unlocked, setUnlocked] = useState(false); // Controls Vault access
-  const [showUnlockModal, setShowUnlockModal] = useState(false); // Controls modal visibility
-  
+  const [loading, setLoading] = useState(true);
+  const [vaultItems, setVaultItems] = useState([]);
+  const [visibleIndex, setVisibleIndex] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
+  const toggleVisibility = (index) => {
+    setVisibleIndex(index === visibleIndex ? null : index);
+  };
 
-  const handleUnlock = (e) => {
-    e.preventDefault();
-    if (password === "admin") {
-      setUnlocked(true);
-      toast.success("🔓 Vault unlocked!");
-    } else {
-      toast.error("❌ Incorrect password!");
-    }
+  const handleCopy = (password) => {
+    navigator.clipboard.writeText(password);
+    toast.success("Password copied to clipboard!");
   };
 
   useEffect(() => {
-    if (!loading && !isFirstTimeUser && !unlocked) {
-      setShowUnlockModal(true);
-    }
-  }, [loading, isFirstTimeUser, unlocked]);
+    const fetchVaultItems = async () => {
+      try {
+        const res = await axiosInstance.get("/api/vault/getall");
+        setVaultItems(res.data); // Make sure backend returns vaultItems array
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load vault items");
+      }
+    };
 
-  if (loading) return <LoadingScreen />;
+    fetchVaultItems();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosInstance.delete(`/api/vault/delete/${id}`);
+      setVaultItems((prev) => prev.filter((item) => item._id !== id));
+      toast.success("Password deleted 🗑️");
+      setVaultItems(prev => prev.filter(item => item._id !== id))
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete password");
+    }
+  };
+  
+
+  // if (loading) return <LoadingScreen />;
 
   return (
     <div
@@ -52,55 +70,82 @@ const Vault = () => {
         >
           Welcome to your secured Vault!
         </p>
-        <div className="grid gap-4 mt-6">
-          {[
-            { app: "Google", password: "mySecret123" },
-            { app: "Facebook", password: "passw0rd!" },
-            { app: "Twitter", password: "qwerty12345" },
-          ].map((item, index) => (
+
+        <button
+          onClick={() => setShowAddModal(true)}
+          className={`px-4 py-2 rounded-xl font-semibold transition flex justify-center items-center gap-1 ${
+            darkTheme
+              ? "bg-dark-accent text-white hover:bg-dark-hover"
+              : "bg-light-accent text-white hover:bg-light-hover"
+          }`}
+        >
+          <IoMdAdd /> Add Password
+        </button>
+
+        {showAddModal && (
+          <AddPasswordModal
+            isOpen={showAddModal}
+            onClose={() => setShowAddModal(false)}
+            onSuccess={(newItem) => {
+              setVaultItems((prev) => [...prev, newItem]);
+              toast.success("Password added successfully!");
+            }}
+          />
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 w-full max-w-6xl mx-auto">
+          {vaultItems.map((item, index) => (
             <div
               key={index}
-              className={`p-4 rounded-xl shadow-md flex justify-between items-center ${
+              className={`px-10 py-3 rounded-xl shadow-md flex justify-between items-center ${
                 darkTheme
                   ? "bg-dark-secondary text-dark-primaryText"
                   : "bg-light-secondary text-light-primaryText"
               }`}
             >
               <div>
-                <h3 className="font-semibold">{item.app}</h3>
-                <p className="font-mono text-sm">••••••••••••</p>
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="font-mono text-sm">
+                  {visibleIndex === index ? item.password : "••••••••••••"}
+                </p>
               </div>
-              <button
-                className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                  darkTheme
-                    ? "bg-dark-accent text-white hover:bg-dark-hover"
-                    : "bg-light-accent text-white hover:bg-light-hover"
-                } transition`}
-              >
-                Copy
-              </button>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => toggleVisibility(index)}
+                  className={`p-1 rounded-md ${
+                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
+                  } transition`}
+                >
+                  {visibleIndex === index ? (
+                    <EyeOff size={18} />
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+
+                <button
+                  onClick={() => handleCopy(item.password)}
+                  className={`p-1 rounded-md ${
+                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
+                  } transition`}
+                >
+                  <Copy size={18} />
+                </button>
+
+                <button
+                  onClick={() => handleDelete(item._id)}
+                  className={`p-1 rounded-md ${
+                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
+                  } transition`}
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* Vault Setup Modal for first-time users */}
-      {isFirstTimeUser ? <VaultSetupModal isOpen={true} /> : null}
-
-      {/* Unlock Vault Form */}
-      <VaultUnlockModal
-        isOpen={showUnlockModal}
-        onSuccess={() => {
-          setUnlocked(true);
-          setShowUnlockModal(false);
-          toast.success("🔓 Vault unlocked!");
-        }}
-        onCancel={() => {
-          toast.info("Vault unlock cancelled. Redirecting...");
-          navigate("/dashboard");
-          setShowUnlockModal(false);
-        }}
-      />
     </div>
   );
 };
