@@ -92,30 +92,47 @@ module.exports.addVault = async (req, res) => {
 }
 
 
-module.exports.updateVault = async (req, res) => {
+exports.updateVault = async (req, res) => {
     try {
-        const { id } = req.params;
-        const { encryptedData } = req.body;
-        const userId = req.user._id;
-        if (!userId) {
-            return res.status(400).json({ errors: ["User ID is required"] });
-        }
-        if (!encryptedData) {
-            return res.status(400).json({ errors: ["Encrypted data is required"] });
-        }
-        const vaultItem = await VaultItem.findByIdAndUpdate(id, { encryptedData }, { new: true });
-        if (!vaultItem) {
-            return res.status(404).json({ errors: ["Vault item not found"] });
-        }
+      const userId = req.user._id;
+      const vaultId = req.params.id;
+      const { title, username, password } = req.body;
+  
+      const vaultItem = await VaultItem.findOne({ _id: vaultId, userId: userId });
+  
+      if (!vaultItem) {
+        return res.status(404).json({ errors:[ "Vault item not found" ]});
+      }
+  
+      //  Get encryption key (assume it's derived from user's salt or stored safely)
+      const key = generateEncryptionKey(userId); // Your logic
+  
+      const encrypt = (text) => {
+        const iv = crypto.randomBytes(12);
+        const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+        let encrypted = cipher.update(text, "utf8", "base64");
+        encrypted += cipher.final("base64");
+        const tag = cipher.getAuthTag().toString("base64");
+        return { data: encrypted, iv: iv.toString("base64"), tag };
+      };
+  
+      //  Encrypt new fields
+      if (title) vaultItem.encryptedData.title = encrypt(title);
+      if (username) vaultItem.encryptedData.username = encrypt(username);
+      if (password) vaultItem.encryptedData.password = encrypt(password);
+      
+  
+      await vaultItem.save();
 
-        return res.status(200).json({ message: "Vault item updated successfully", vaultItem });
 
-
-    } catch (error) {
-        return res.status(500).json({ errors: ["Internal server error"] });
-
+  
+      return res.status(200).json({ message: "Vault item updated successfully"});
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Something went wrong!" });
     }
-}
+  };
+  
 
 module.exports.deleteVault = async (req, res) => {
     try {
@@ -139,47 +156,7 @@ module.exports.deleteVault = async (req, res) => {
 }
 
 
-module.exports.getSalt = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const user = await userModel.findById(userId);
-        if (!user || !user.vaultSalt) {
-            return res.status(404).json({ error: "Salt not found" });
-        }
-        return res.status(200).json({ salt: user.vaultSalt });
-    } catch (error) {
-        return res.status(500).json({ error: "Server error" });
-    }
-};
 
 
 
 
-module.exports.generateSalt = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const salt = crypto.randomBytes(16).toString("hex");
-
-        const user = await userModel.findByIdAndUpdate(userId, {
-            vaultSalt: salt,
-        }, { new: true });
-
-        return res.status(200).json({ salt: user.vaultSalt });
-    } catch (err) {
-        return res.status(500).json({ error: "Server error" });
-    }
-};
-
-
-module.exports.getDummy = async (req, res) => {
-    try {
-        console.log(req.user._id)
-        const dummyItem = await VaultItem.findOne({ userId: req.user._id, isDummy: true });
-        if (!dummyItem) return res.status(404).json({ message: "Dummy item not found" });
-
-        res.json(dummyItem);
-    } catch (error) {
-        console.error("Failed to fetch dummy:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-}
