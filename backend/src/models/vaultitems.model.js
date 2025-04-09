@@ -6,21 +6,25 @@ const VaultItemSchema = new mongoose.Schema({
       ref: 'User',
       required: true,
     },
-    title:{
-        type: String,
-        required: true,
-    },
     encryptedData: {
-      iv: String,
-      data: String
+      title: {
+        data: String,
+        iv: String,
+        tag: String,
+      },
+      username: {
+        data: String,
+        iv: String,
+        tag: String,
+      },
+      password: {
+        data: String,
+        iv: String,
+        tag: String,
+      },
     },
-    isDummy: {
-      type: Boolean,
-      default: false,
-    },
+    createdAt: { type: Date, default: Date.now },
 
-  }, {
-    timestamps: true,
   });
 
 
