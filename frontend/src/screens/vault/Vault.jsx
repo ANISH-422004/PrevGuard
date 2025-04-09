@@ -7,6 +7,7 @@ import { IoMdAdd } from "react-icons/io";
 import axiosInstance from "../../config/axios/axios";
 import AddPasswordModal from "../../components/AddPasswordModal";
 import DeleteConfirmModal from "../../components/DeleteConfirmModal";
+import UpdatePasswordModal from "../../components/UpdatePasswordModal";
 
 const Vault = () => {
   const darkTheme = useSelector((state) => state.theme.darkTheme);
@@ -17,13 +18,15 @@ const Vault = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const handleDeleteClick = (itemId) => {
     setItemToDelete(itemId);
     setShowDeleteModal(true);
   };
 
-  console.log(itemToDelete)
+  console.log(itemToDelete);
   const confirmDelete = async () => {
     try {
       await axiosInstance.delete(`/api/vault/delete/${itemToDelete}`);
@@ -59,7 +62,6 @@ const Vault = () => {
 
     fetchVaultItems();
   }, []);
-
 
   return (
     <div
@@ -107,6 +109,19 @@ const Vault = () => {
           onCancel={() => {
             setShowDeleteModal(false);
             setItemToDelete(null);
+          }}
+        />
+
+        <UpdatePasswordModal
+          isOpen={showEditModal}
+          vaultItem={selectedItem}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedItem(null);
+          }}
+          onSuccess={async () => {
+            const res = await axiosInstance.get("/api/vault/getall");
+            setVaultItems(res.data);
           }}
         />
 
@@ -158,6 +173,18 @@ const Vault = () => {
                   } transition`}
                 >
                   <Trash2 size={18} />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedItem(item);
+                    setShowEditModal(true);
+                  }}
+                  className={`p-1 rounded-md ${
+                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
+                  } transition text-blue-500`}
+                >
+                  Edit
                 </button>
               </div>
             </div>
