@@ -7,7 +7,7 @@ import OTP from "../screens/OTP/OTP";
 import Dashboard from "../screens/Dashboard/Dashboard";
 import Protected from "../HOC/Protected";
 import Vault from "../screens/vault/Vault";
-
+import FakeData from "../screens/fakeData/fakeData";
 
 const AppRoutes = () => {
   return (
@@ -24,13 +24,25 @@ const AppRoutes = () => {
           </Protected>
         }
       />
-      <Route path="/vault"
+      <Route
+        path="/vault"
         element={
           <Protected>
             <Vault />
           </Protected>
         }
       />
+
+      <Route
+        path="/fake-data"
+        element={
+          <Protected>
+            <FakeData />
+          </Protected>
+        }
+      />
+
+      
     </Routes>
   );
 };

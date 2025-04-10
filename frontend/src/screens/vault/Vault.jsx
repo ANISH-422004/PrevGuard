@@ -26,7 +26,6 @@ const Vault = () => {
     setShowDeleteModal(true);
   };
 
-  console.log(itemToDelete);
   const confirmDelete = async () => {
     try {
       await axiosInstance.delete(`/api/vault/delete/${itemToDelete}`);
