@@ -22,7 +22,7 @@ exports.generateFakeData = async (req, res) => {
         const fakeDataInstance = new fakeDataModel({
             userId,
             name: faker.person.fullName(),
-            email: `${faker.string.alphanumeric(6)}@privguard.com`,
+            email: `${faker.string.alphanumeric(6)}@privguard.me`,
             emailActive: true,
             phone: faker.phone.number(),
             address: faker.location.streetAddress(),
