@@ -12,6 +12,6 @@ router.post("/generate", authUser, fakeDataController.generateFakeData);
 router.get("/all", authUser, fakeDataController.getFakeData);
 
 // DELETE - Delete a specific fake data entry by ID
-router.delete("/delete", authUser, fakeDataController.deleteFakeData);
+router.post("/delete", authUser, fakeDataController.deleteFakeData);
 
 module.exports = router;
