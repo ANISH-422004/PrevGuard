@@ -8,6 +8,7 @@ import Dashboard from "../screens/Dashboard/Dashboard";
 import Protected from "../HOC/Protected";
 import Vault from "../screens/vault/Vault";
 import FakeData from "../screens/fakeData/fakeData";
+import BreachMonitor from "../screens/BreachMonitor/BreachMonitor";
 
 const AppRoutes = () => {
   return (
@@ -42,6 +43,14 @@ const AppRoutes = () => {
         }
       />
 
+        <Route 
+        path="/breach-check"
+        element={
+          <Protected>
+            <BreachMonitor />
+          </Protected>
+        }
+        />
       
     </Routes>
   );
