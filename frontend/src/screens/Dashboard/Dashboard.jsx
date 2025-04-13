@@ -26,7 +26,7 @@ const Dashboard = () => {
           score: calculateEmailRiskScore(entry.breaches),
         }));
 
-        console.log(emailScores);
+        console.log()
 
         setEmailRiskScores(emailScores);
       })
