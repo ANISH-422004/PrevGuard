@@ -9,6 +9,8 @@ const vaultRoutes = require('./routes/vault.routes');
 const fakeDataRoutes = require("./routes/fakeData.routes");
 const emailRoutes = require("./routes/email.routes");
 const breachRoutes = require("./routes/breach.routes");
+const sharedDataRoutes = require("./routes/sharedData.routes");
+
 
 // Middleware
 app.use(morgan('dev'));
@@ -35,6 +37,9 @@ app.use('/api/vault', vaultRoutes);
 app.use("/api/fake-data", fakeDataRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/breaches", breachRoutes);
+app.use("/api/sharedApps", sharedDataRoutes);
+
+
 
 // 404 Handler
 app.use((req, res, next) => {

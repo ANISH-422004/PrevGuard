@@ -51,7 +51,7 @@
         },
         sharedData: [{
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'SharedData',
+            ref: 'SharedApp',
         }],
         savedFakeData: [{
             type: mongoose.Schema.Types.ObjectId,
