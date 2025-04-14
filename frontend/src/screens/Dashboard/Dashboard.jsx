@@ -2,41 +2,44 @@ import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { useSelector } from "react-redux";
-import { calculateEmailRiskScore } from "../../utils/riskCalculator";
+import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../../config/axios/axios";
 import Loading from "../../components/Loading";
+import { fetchBreaches } from "../../app/actions/breachActions";
+import { setSharedAppsData } from "../../app/slices/sharedAppsSlice";
+import mapAppsToRisk from "../../utils/riskCalculator";
 
 const Dashboard = () => {
   const { darkTheme } = useSelector((state) => state.theme);
   const user = useSelector((state) => state.user.user);
-  const [emailRiskScores, setEmailRiskScores] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const breaches = useSelector((state) => state.breaches.data);
+  const sharedApps = useSelector((state) => state.sharedApps.sharedApps);
+  const dispatch = useDispatch(); 
+  const risk = mapAppsToRisk(sharedApps, breaches);
+
+
+  
+
 
   useEffect(() => {
-    setLoading(true);
-    axiosInstance
-      .get(`/api/user/${user._id}`)
-      .then((res) => {
-        const { breachAlerts } = res.data.user;
+    async function loadData() {
+      setLoading(true);
+      try {
+        // 1) fetch shared apps
+        const res = await axiosInstance.get("/api/sharedApps");
+        dispatch(setSharedAppsData(res.data));
 
-        const emailScores = breachAlerts.map((entry) => ({
-          email: entry.email,
-          _id: entry._id,
-          score: calculateEmailRiskScore(entry.breaches),
-        }));
-
-        console.log()
-
-        setEmailRiskScores(emailScores);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .finally(() => {
+        // 2) fetch breaches
+        await dispatch(fetchBreaches());
+      } catch (err) {
+        console.error(err);
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    }
+    loadData();
+  }, [dispatch]);
 
   return (
     <div
@@ -50,59 +53,11 @@ const Dashboard = () => {
       {loading ? (
         <Loading />
       ) : (
-        <>
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Dashboard</h2>
-            <div className="flex items-center gap-4">
-              {/* Optional: Add Bell Icon or Toggle */}
-            </div>
-          </div>
+<>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {emailRiskScores.map(({ email, score }) => {
-              let badgeColor =
-                score < 30
-                  ? "text-green-500"
-                  : score < 70
-                  ? "text-yellow-400"
-                  : "text-red-500";
 
-              return (
-                <div
-                  key={email}
-                  className={`transition-all duration-300 hover:scale-[1.02] backdrop-blur-md border rounded-2xl p-5 flex flex-col justify-between shadow-md ${
-                    darkTheme
-                      ? "bg-dark-secondary border-white/10 text-dark-primaryText"
-                      : "bg-light-secondary border-gray-300 text-light-primaryText"
-                  }`}
-                >
-                  <h3 className="text-lg font-semibold break-words">{email}</h3>
-                  <div className="flex items-center justify-between mt-4">
-                    <span className={`text-sm font-bold ${badgeColor}`}>
-                      Risk Score: {score}/100
-                    </span>
-                    <div className="w-12 h-12">
-                      <CircularProgressbar
-                        value={score}
-                        text={`${score}`}
-                        styles={buildStyles({
-                          textColor: darkTheme ? "#E3DFFD" : "#241847",
-                          pathColor:
-                            score < 30
-                              ? "#22c55e"
-                              : score < 70
-                              ? "#facc15"
-                              : "#ef4444",
-                          trailColor: darkTheme ? "#221736" : "#DCD6F7",
-                        })}
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
+
+</>
       )}
     </div>
   );

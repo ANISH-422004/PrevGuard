@@ -9,6 +9,7 @@ import Protected from "../HOC/Protected";
 import Vault from "../screens/vault/Vault";
 import FakeData from "../screens/fakeData/fakeData";
 import BreachMonitor from "../screens/BreachMonitor/BreachMonitor";
+import SharedApps from "../screens/SharedApps/SharedApps";
 
 const AppRoutes = () => {
   return (
@@ -51,6 +52,16 @@ const AppRoutes = () => {
           </Protected>
         }
         />
+
+
+        <Route
+        path="/shared-data"
+        element={
+          <Protected>
+            <SharedApps />
+          </Protected>
+        }
+      />
       
     </Routes>
   );

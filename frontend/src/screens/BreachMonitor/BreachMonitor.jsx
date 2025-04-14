@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from "../../config/axios/axios";
+import axios from "axios";
 import { useSelector } from "react-redux";
 import { CheckCircle, AlertTriangle } from "lucide-react";
 import Loading from "../../components/Loading";
@@ -15,15 +15,61 @@ const BreachMonitor = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axiosInstance.get(`/api/breaches/${email}`);
-      setBreachData(res.data.breachAlert);
+      const res = await axios.get(
+        `https://api.xposedornot.com/v1/breach-analytics?email=${email}`
+      );
+      setBreachData(res.data);
     } catch (err) {
       setError("Could not fetch breach info");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const themeClass = darkTheme ? "dark" : "light";
+
+  const renderExposedData = () => {
+    return breachData?.BreachMetrics?.xposed_data[0]?.children.map((category, i) => (
+      <div key={i} className="mb-3">
+        <h4 className="font-semibold text-md">{category.name}</h4>
+        <ul className="list-disc list-inside ml-4 text-sm">
+          {category.children.map((item, j) => (
+            <li key={j}>{item.name.replace("data_", "")}</li>
+          ))}
+        </ul>
+      </div>
+    ));
+  };
+
+  const renderBreaches = () => {
+    const breaches = breachData?.ExposedBreaches?.breaches_details || [];
+    return breaches.map((breach, index) => (
+      <div
+        key={index}
+        className="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-red-500 shadow-lg transition hover:scale-[1.01]"
+      >
+        <div className="flex items-center gap-2 mb-2 text-red-400 font-semibold text-sm sm:text-base">
+          <AlertTriangle className="w-5 h-5" />
+          Breach Detected
+        </div>
+        <img src={breach.logo} alt={breach.breach} className="w-20 h-auto mb-3" />
+        <p><strong>📛 Breach:</strong> {breach.breach}</p>
+        <p><strong>🧠 Industry:</strong> {breach.industry}</p>
+        <p><strong>📅 Year:</strong> {breach.xposed_date}</p>
+        <p><strong>🧾 Records:</strong> {breach.xposed_records.toLocaleString()}</p>
+        <p><strong>🔐 Exposed:</strong> {breach.xposed_data}</p>
+        <p><strong>📖 Details:</strong> {breach.details}</p>
+        <a
+          href={breach.references}
+          target="_blank"
+          rel="noreferrer"
+          className="text-blue-400 underline text-sm mt-2 inline-block"
+        >
+          Learn more
+        </a>
+      </div>
+    ));
+  };
 
   return (
     <div
@@ -33,8 +79,7 @@ const BreachMonitor = () => {
         🔐 Email Breach Monitor
       </h1>
 
-      {/* Input Section */}
-      <div className="w-full max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl flex flex-col sm:flex-row gap-4 mb-10">
+      <div className="w-full max-w-xl flex flex-col sm:flex-row gap-4 mb-10">
         <input
           type="email"
           className={`flex-1 px-4 py-2 rounded-lg bg-${themeClass}-secondary text-${themeClass}-primaryText placeholder-${themeClass}-secondaryText focus:outline-none`}
@@ -50,39 +95,44 @@ const BreachMonitor = () => {
         </button>
       </div>
 
-      {/* Feedback Section */}
-      {loading && <p className="text-sm sm:text-base flex gap-4"><Loading/> Checking breaches...</p>}
-      {error && <p className="text-red-500 text-sm sm:text-base">{error}</p>}
+      {loading && <p className="text-sm flex gap-4"><Loading /> Checking breaches...</p>}
+      {error && <p className="text-red-500">{error}</p>}
 
-      {/* Results Section */}
       {breachData && (
-        <div className="w-full max-w-sm sm:max-w-md md:max-w-2xl space-y-6">
-          <h2 className="text-lg sm:text-xl font-semibold mb-2 text-center sm:text-left">
-            Results for <span className="underline">{breachData.email}</span>
-          </h2>
+        <div className="w-full max-w-4xl space-y-6">
+          {/* Summary Section */}
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">🔍 Summary</h2>
+            <p>
+              Breach Site:{" "}
+              <span className="font-medium">{breachData.BreachesSummary?.site}</span>
+            </p>
+            <p>
+              Overall Risk:{" "}
+              <span className="font-medium">
+                {breachData.BreachMetrics?.risk[0]?.risk_label} (
+                {breachData.BreachMetrics?.risk[0]?.risk_score})
+              </span>
+            </p>
+            <p>
+              Weak Passwords:{" "}
+              <span className="font-medium">
+                {breachData.BreachMetrics?.passwords_strength[0]?.EasyToCrack}
+              </span>
+            </p>
+          </div>
 
-          {breachData.breaches.length === 0 ? (
-            <div className="flex items-center gap-3 bg-green-100 text-green-700 border border-green-300 px-6 py-4 rounded-xl shadow-md">
-              <CheckCircle className="w-6 h-6" />
-              <span>No breaches found — you're safe! ✅</span>
-            </div>
-          ) : (
-            breachData.breaches.map((breach, index) => (
-              <div
-                key={index}
-                className="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-xl border border-red-500 shadow-lg transition hover:scale-[1.01]"
-              >
-                <div className="flex items-center gap-2 mb-2 text-red-400 font-semibold text-sm sm:text-base">
-                  <AlertTriangle className="w-5 h-5" />
-                  Breach Detected
-                </div>
-                <p><strong>🛡 Source:</strong> {breach.source}</p>
-                <p><strong>📅 Date:</strong> {new Date(breach.date).toLocaleDateString()}</p>
-                <p><strong>🔐 Type:</strong> {breach.type}</p>
-                <p><strong>📄 Details:</strong> {breach.details}</p>
-              </div>
-            ))
-          )}
+          {/* Exposed Data Section */}
+          <div>
+            <h2 className="text-xl font-semibold mb-2">📂 Exposed Data</h2>
+            {renderExposedData()}
+          </div>
+
+          {/* Breaches Section */}
+          <div>
+            <h2 className="text-xl font-semibold mb-2">📛 Breaches</h2>
+            {renderBreaches()}
+          </div>
         </div>
       )}
     </div>
