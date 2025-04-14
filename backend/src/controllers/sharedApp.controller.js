@@ -1,38 +1,47 @@
 const SharedApp = require("../models/SharedApp.model");
 const userModel = require("../models/user.model");
 
+// Get all shared apps for the logged-in user
 const getSharedApps = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Fetching the user with populated sharedData
-    const user = await userModel.findById(userId).populate("sharedData");
+    // Find all apps created by the user
+    const sharedApps = await SharedApp.find({ userId });
 
-    res.json(user.sharedData);
+    res.json(sharedApps);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
 
+// Add a new shared app
 const addSharedApp = async (req, res) => {
   try {
     const userId = req.user.id;
     const { appName, sharedData, accessDate, lastAccessed } = req.body;
 
-    // Create a new shared app document
+    // Validate sharedData to only contain booleans
+    const validatedSharedData = {
+      email: !!sharedData.email,
+      password: !!sharedData.password,
+      phoneNumber: !!sharedData.phoneNumber,
+      location: !!sharedData.location,
+      aadhaarNumber: !!sharedData.aadhaarNumber,
+    };
+
     const newApp = new SharedApp({
       userId,
       appName,
-      sharedData, // We directly save the sharedData as it is a nested object
+      sharedData: validatedSharedData,
       accessDate,
       lastAccessed,
     });
 
-    // Save the new shared app
     await newApp.save();
 
-    // Push reference to user's sharedData array
+    // Add app reference to user's sharedData array
     await userModel.findByIdAndUpdate(userId, {
       $push: { sharedData: newApp._id },
     });
@@ -44,15 +53,29 @@ const addSharedApp = async (req, res) => {
   }
 };
 
+// Update a shared app
 const updateSharedApp = async (req, res) => {
   try {
     const appId = req.params.id;
-    const updatedData = req.body; // The entire updated data object will come in the body
+    const { appName, sharedData } = req.body;
 
-    // Find and update the shared app document
-    const updatedApp = await SharedApp.findByIdAndUpdate(appId, updatedData, {
-      new: true,
-    });
+    const updatedSharedData = {
+      email: !!sharedData.email,
+      password: !!sharedData.password,
+      phoneNumber: !!sharedData.phoneNumber,
+      location: !!sharedData.location,
+      aadhaarNumber: !!sharedData.aadhaarNumber,
+    };
+
+    const updatedApp = await SharedApp.findByIdAndUpdate(
+      appId,
+      {
+        appName,
+        sharedData: updatedSharedData,
+        lastAccessed: new Date(),
+      },
+      { new: true }
+    );
 
     if (!updatedApp) {
       return res.status(404).json({ message: "Shared app not found" });
@@ -65,24 +88,23 @@ const updateSharedApp = async (req, res) => {
   }
 };
 
+// Delete a shared app
 const deleteSharedApp = async (req, res) => {
   try {
     const userId = req.user.id;
     const appId = req.params.id;
 
-    // Find and delete the shared app document
     const deletedApp = await SharedApp.findByIdAndDelete(appId);
 
     if (!deletedApp) {
       return res.status(404).json({ message: "Shared app not found" });
     }
 
-    // Remove the reference to the shared app from the user's sharedData array
     await userModel.findByIdAndUpdate(userId, {
       $pull: { sharedData: appId },
     });
 
-    res.json({ message: "App deleted" });
+    res.json({ message: "App deleted successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });

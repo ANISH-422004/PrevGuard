@@ -3,27 +3,27 @@ const mongoose = require("mongoose");
 const sharedDataSchema = new mongoose.Schema(
   {
     email: {
-      type: String,
-      required: false,
+      type: Boolean,
+      default: false,
     },
     password: {
-      type: String,
-      required: false,
+      type: Boolean,
+      default: false,
     },
     phoneNumber: {
-      type: String,
-      required: false,
+      type: Boolean,
+      default: false,
     },
     location: {
-      type: String, // Can store coordinates or address
-      required: false,
+      type: Boolean,
+      default: false,
     },
     aadhaarNumber: {
-      type: String, // Aadhaar number as a string
-      required: false,
+      type: Boolean,
+      default: false,
     },
   },
-  { _id: false } // Prevent creating an _id for the nested sharedData
+  { _id: false } // No separate _id for nested sharedData object
 );
 
 const sharedAppSchema = new mongoose.Schema(
@@ -38,8 +38,8 @@ const sharedAppSchema = new mongoose.Schema(
       required: true,
     },
     sharedData: {
-      type: sharedDataSchema, // Now a nested object
-      default: {},
+      type: sharedDataSchema,
+      default: () => ({}),
     },
     accessDate: {
       type: Date,

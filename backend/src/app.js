@@ -8,7 +8,6 @@ const userRoutes = require('./routes/user.routes');
 const vaultRoutes = require('./routes/vault.routes');
 const fakeDataRoutes = require("./routes/fakeData.routes");
 const emailRoutes = require("./routes/email.routes");
-const breachRoutes = require("./routes/breach.routes");
 const sharedDataRoutes = require("./routes/sharedData.routes");
 
 
@@ -36,7 +35,6 @@ app.use('/api/user', userRoutes);
 app.use('/api/vault', vaultRoutes);
 app.use("/api/fake-data", fakeDataRoutes);
 app.use("/api/email", emailRoutes);
-app.use("/api/breaches", breachRoutes);
 app.use("/api/sharedApps", sharedDataRoutes);
 
 
