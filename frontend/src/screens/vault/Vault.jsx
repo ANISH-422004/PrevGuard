@@ -1,18 +1,19 @@
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Copy, Eye, EyeOff, Trash2 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from "react-redux";
+import axiosInstance from "../../config/axios/axios";
+import { resetVault, setVaultUnlocked } from "../../app/slices/vaultSlice"; 
 import { toast } from "react-toastify";
 import { IoMdAdd } from "react-icons/io";
-import axiosInstance from "../../config/axios/axios";
 import AddPasswordModal from "../../components/AddPasswordModal";
 import DeleteConfirmModal from "../../components/DeleteConfirmModal";
 import UpdatePasswordModal from "../../components/UpdatePasswordModal";
+import { Copy, Eye, EyeIcon, EyeOff, EyeOffIcon, Trash2 } from "lucide-react";
 
 const Vault = () => {
   const darkTheme = useSelector((state) => state.theme.darkTheme);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [vaultItems, setVaultItems] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -20,6 +21,52 @@ const Vault = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  const vaultUnlocked = useSelector((state) => state.vault.unlocked);
+
+  useEffect(() => {
+    const checkVaultStatus = async () => {
+      try {
+        const res = await axiosInstance.get(
+          "http://localhost:3000/api/vault/isInitialized"
+        );
+        const user = res.data;
+        dispatch(setVaultUnlocked(user.isInitialized));
+
+        if (!user.isInitialized) {
+          navigate("/setupVaultPassword");  // Redirect to setup password page if vault is not initialized
+        } else if (!vaultUnlocked) {
+          navigate("/vaultPassword");  // Navigate to the password entry page if vault is unlocked
+        }
+      } catch (err) {
+        console.log("Error checking vault status:", err);
+        toast.error("Could not check vault status. Try again.");
+      }
+    };
+
+    checkVaultStatus();
+
+    // Reset vault state when the component unmounts
+    return () => {
+      dispatch(resetVault());
+    };
+  }, [dispatch, navigate, vaultUnlocked]);
+
+  useEffect(() => {
+    if (vaultUnlocked) {
+      const fetchVaultItems = async () => {
+        try {
+          const res = await axiosInstance.get("/api/vault/getall");
+          setVaultItems(res.data); 
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to load vault items");
+        }
+      };
+
+      fetchVaultItems();
+    }
+  }, [vaultUnlocked]);
 
   const handleDeleteClick = (itemId) => {
     setItemToDelete(itemId);
@@ -48,45 +95,19 @@ const Vault = () => {
     toast.success("Password copied to clipboard!");
   };
 
-  useEffect(() => {
-    const fetchVaultItems = async () => {
-      try {
-        const res = await axiosInstance.get("/api/vault/getall");
-        setVaultItems(res.data); // Make sure backend returns vaultItems array
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load vault items");
-      }
-    };
-
-    fetchVaultItems();
-  }, []);
-
   return (
     <div
-      className={`min-h-screen flex flex-col items-center justify-center px-4 py-8 ${
-        darkTheme
-          ? "bg-dark-background text-dark-primaryText"
-          : "bg-light-background text-light-primaryText"
-      }`}
+      className={`min-h-screen flex flex-col items-center justify-center px-4 py-8 ${darkTheme ? "bg-dark-background text-dark-primaryText" : "bg-light-background text-light-primaryText"}`}
     >
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-semibold">🔓 Vault Access Granted</h1>
-        <p
-          className={`${
-            darkTheme ? "text-dark-secondaryText" : "text-light-secondaryText"
-          }`}
-        >
+        <p className={`${darkTheme ? "text-dark-secondaryText" : "text-light-secondaryText"}`}>
           Welcome to your secured Vault!
         </p>
 
         <button
           onClick={() => setShowAddModal(true)}
-          className={`px-4 py-2 rounded-xl font-semibold transition flex justify-center items-center gap-1 ${
-            darkTheme
-              ? "bg-dark-accent text-white hover:bg-dark-hover"
-              : "bg-light-accent text-white hover:bg-light-hover"
-          }`}
+          className={`px-4 py-2 rounded-xl font-semibold transition flex justify-center items-center gap-1 ${darkTheme ? "bg-dark-accent text-white hover:bg-dark-hover" : "bg-light-accent text-white hover:bg-light-hover"}`}
         >
           <IoMdAdd /> Add Password
         </button>
@@ -129,11 +150,7 @@ const Vault = () => {
           {vaultItems.map((item, index) => (
             <div
               key={index}
-              className={`px-10 py-3 rounded-xl shadow-md flex justify-between items-center ${
-                darkTheme
-                  ? "bg-dark-secondary text-dark-primaryText"
-                  : "bg-light-secondary text-light-primaryText"
-              }`}
+              className={`px-10 py-3 rounded-xl shadow-md flex justify-between items-center ${darkTheme ? "bg-dark-secondary text-dark-primaryText" : "bg-light-secondary text-light-primaryText"}`}
             >
               <div>
                 <h3 className="font-semibold">{item.title}</h3>
@@ -145,31 +162,21 @@ const Vault = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => toggleVisibility(index)}
-                  className={`p-1 rounded-md ${
-                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
-                  } transition`}
+                  className={`p-1 rounded-md ${darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"} transition`}
                 >
-                  {visibleIndex === index ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
+                  {visibleIndex === index ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />}
                 </button>
 
                 <button
                   onClick={() => handleCopy(item.password)}
-                  className={`p-1 rounded-md ${
-                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
-                  } transition`}
+                  className={`p-1 rounded-md ${darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"} transition`}
                 >
                   <Copy size={18} />
                 </button>
 
                 <button
                   onClick={() => handleDeleteClick(item._id)}
-                  className={`p-1 rounded-md ${
-                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
-                  } transition`}
+                  className={`p-1 rounded-md ${darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"} transition`}
                 >
                   <Trash2 size={18} />
                 </button>
@@ -179,16 +186,14 @@ const Vault = () => {
                     setSelectedItem(item);
                     setShowEditModal(true);
                   }}
-                  className={`p-1 rounded-md ${
-                    darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"
-                  } transition text-blue-500`}
+                  className={`p-1 rounded-md ${darkTheme ? "hover:bg-dark-hover" : "hover:bg-light-hover"} transition text-blue-500`}
                 >
                   Edit
                 </button>
               </div>
             </div>
           ))}
-        </div>
+        </div>  
       </div>
     </div>
   );
