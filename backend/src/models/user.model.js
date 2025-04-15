@@ -21,6 +21,10 @@
             type: String,
             required: true,
         },
+        vaultPassword: {
+            type: String,
+            default: null,
+        },
         phoneNumber: {
             type: String,
             required: true,
@@ -30,10 +34,7 @@
             type: String,
             default: "https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg",
         },
-        vaultSalt: {
-            type: String,
-            required: false, // Only required once they use the vault
-          },
+
         isVerified: {
             type: Boolean,
             default: false,
@@ -71,6 +72,10 @@
     userSchema.methods.comparePassword = function (password) {
         return bcrypt.compareSync(password, this.password);
     };
+    userSchema.methods.compareVaultPassword = function (password) {
+        return bcrypt.compareSync(password, this.vaultPassword);
+    };
+
     userSchema.statics.generateToken = function (user) {
         return jwt.sign({ id: user._id, email: user.email }, config.JWT_SECRET);
     };
