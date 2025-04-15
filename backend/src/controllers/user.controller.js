@@ -1,15 +1,17 @@
 const userModel = require("../models/user.model");
 
+
+
 module.exports.getUserById = async (req, res) => {
     
     try {
         const userId = req.params.id;
         const user = await userModel.findById(userId)
             .select("-password -__v")
-            .populate({
-            path: "breachAlerts",
-            select: "-__v"
-            });
+            .populate("savedFakeData")
+            .populate("sharedData")
+            .populate("breachAlerts")
+            
 
         if (!user) {
             return res.status(404).json({ errors: ["User not found"] });

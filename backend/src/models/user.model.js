@@ -2,6 +2,7 @@
     const config = require('../config/config');
     const bcrypt = require('bcrypt');
     const jwt = require('jsonwebtoken');
+    require("./BreachAlert.model");
 
 
     const userSchema = new mongoose.Schema({
