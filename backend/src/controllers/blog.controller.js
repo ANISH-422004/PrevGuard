@@ -12,6 +12,6 @@ module.exports.createBlog = async (req, res) => {
 
 
 module.exports.getAllBlogs = async (req, res) => {
-    const blogs = await Blog.find().sort({ datePublished: -1 });
+    const blogs = await blogModel.find().sort({ datePublished: -1 });
     res.json(blogs);
 }

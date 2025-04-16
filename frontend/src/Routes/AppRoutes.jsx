@@ -13,6 +13,7 @@ import SharedApps from "../screens/SharedApps/SharedApps";
 import ProfilePage from "../screens/profile/ProfilePage";
 import VaultPasswordSetup from "../screens/vaultPasswordSetup/vaultPasswordSetup";
 import UnlockVault from "../screens/unlockVault/UnlockVault";
+import BlogPage from "../screens/BlogPage/BlogPage";
 
 const AppRoutes = () => {
   return (
@@ -91,6 +92,17 @@ const AppRoutes = () => {
           </Protected>
         }
       />
+
+
+        <Route
+          path="/privacy-tips"
+          element={
+            <Protected>
+              <BlogPage/>
+            </Protected>
+          }
+        />
+
     </Routes>
   );
 };

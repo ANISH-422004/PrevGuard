@@ -116,7 +116,7 @@ const NavBar = () => {
             to={"/"}
             className="hidden md:block text-lg lg:text-xl font-semibold text-light-primaryText dark:text-dark-primaryText bg-gradient-to-r from-light-accent to-light-action dark:from-dark-accent dark:to-dark-action bg-clip-text text-transparent"
           >
-            PrevGuard
+            PrivGuard
           </Link>
         </motion.div>
 
