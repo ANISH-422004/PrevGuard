@@ -5,6 +5,7 @@ const _config = {
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
     VAULT_SECRET_KEY: process.env.VAULT_SECRET_KEY,
+    NEWS_API_KEY: process.env.NEWS_API_KEY,
 }
 
 const config = Object.freeze(_config)
