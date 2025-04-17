@@ -4,16 +4,16 @@ import Home from "../screens/home,/Home";
 import Register from "../screens/Register/Register";
 import Login from "../screens/Login/Login";
 import OTP from "../screens/OTP/OTP";
-import Dashboard from "../screens/Dashboard/Dashboard";
 import Protected from "../HOC/Protected";
 import Vault from "../screens/vault/Vault";
-import FakeData from "../screens/fakeData/fakeData";
 import BreachMonitor from "../screens/BreachMonitor/BreachMonitor";
 import SharedApps from "../screens/SharedApps/SharedApps";
 import ProfilePage from "../screens/profile/ProfilePage";
 import VaultPasswordSetup from "../screens/vaultPasswordSetup/vaultPasswordSetup";
 import UnlockVault from "../screens/unlockVault/UnlockVault";
 import BlogPage from "../screens/BlogPage/BlogPage";
+import PasswordBreachCheck from "../screens/PasswordBreachCheck/PasswordBreachCheck";
+import Fakedata from "../screens/fakeData/FakeData";
 
 const AppRoutes = () => {
   return (
@@ -23,10 +23,10 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/otp" element={<OTP />} />
       <Route
-        path="/dashboard"
+        path="/password-strength-checker"
         element={
           <Protected>
-            <Dashboard />
+              <PasswordBreachCheck/>
           </Protected>
         }
       />
@@ -43,7 +43,7 @@ const AppRoutes = () => {
         path="/fake-data"
         element={
           <Protected>
-            <FakeData />
+            <Fakedata />
           </Protected>
         }
       />

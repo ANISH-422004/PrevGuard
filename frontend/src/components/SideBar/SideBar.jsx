@@ -39,10 +39,10 @@ const SideBar = ({ isOpen, onClose }) => {
         <nav className="flex flex-col gap-4 p-4 text-white dark:text-dark-primaryText">
           <Link
             onClick={onClose}
-            to="/dashboard"
+            to="/password-strength-checker"
             className="text-lg hover:text-light-accent dark:hover:text-dark-accent transition"
           >
-            Dashboard
+            Password Strength Checker
           </Link>
           <Link
             onClick={onClose}

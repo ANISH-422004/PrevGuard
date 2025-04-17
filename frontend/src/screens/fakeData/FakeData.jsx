@@ -228,10 +228,10 @@ const Fakedata = () => {
             >
               <X size={20} />
             </button>
-            <h3 className="text-lg font-semibold mb-1">{item.name}</h3>
-            <p className="text-sm text-secondaryText">{item.phone}</p>
-            <p className="text-sm text-secondaryText">{item.address}</p>
-            <p className="text-sm text-secondaryText">{item.aadhar}</p>
+            <h3 className="text-lg font-semibold mb-1">Fake Name : {item.name}</h3>
+            <p className="text-sm text-secondaryText">Fake PhoneNo. :{item.phone}</p>
+            <p className="text-sm text-secondaryText">Fake Address : {item.address}</p>
+            <p className="text-sm text-secondaryText">Fake AadharNo. :{item.aadhar}</p>
           </div>
         ))}
       </div>

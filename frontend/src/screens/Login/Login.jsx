@@ -36,7 +36,7 @@ const Login = () => {
       localStorage.setItem("token", response.data.token); // Save token
       toast.success("Login Successful!");
       dispatch(removeUser(response.data.user));
-      navigate("/dashboard"); // Redirect after login
+      navigate("/password-strength-checker"); // Redirect after login
     } catch (error) {
       console.log(error)
       toast.error(error.response?.data?.message || "Login failed");

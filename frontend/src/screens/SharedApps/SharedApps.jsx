@@ -9,8 +9,6 @@ import {
   updateSharedAppLocal,
 } from "../../app/slices/sharedAppsSlice";
 
-
-
 const SharedApps = () => {
   const { darkTheme } = useSelector((state) => state.theme);
 
@@ -33,6 +31,25 @@ const SharedApps = () => {
     },
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const DATA_WEIGHTS = {
+    email: 10,
+    password: 25,
+    phoneNumber: 15,
+    location: 20,
+    aadhaarNumber: 30,
+  };
+
+  const calculateRiskScore = (sharedData) => {
+    let score = 0;
+    for (const [key, value] of Object.entries(sharedData)) {
+      if (value && DATA_WEIGHTS[key]) {
+        score += DATA_WEIGHTS[key];
+      }
+    }
+    return score; // max is 100
+  };
+
+  
 
   const handleNewToggle = (field) => {
     setNewAppData((prev) => ({
@@ -46,14 +63,11 @@ const SharedApps = () => {
 
   const createSharedApp = async () => {
     try {
-      const res = await axiosInstance.post(
-        "/api/sharedApps",
-        {
-          appName: newAppData.appName,
-          accessDate: newAppData.accessDate,
-          sharedData: newAppData.sharedData,
-        },
-      );
+      const res = await axiosInstance.post("/api/sharedApps", {
+        appName: newAppData.appName,
+        accessDate: newAppData.accessDate,
+        sharedData: newAppData.sharedData,
+      });
       dispatch(addSharedApp(res.data));
       setShowCreateModal(false);
       setNewAppData({
@@ -71,7 +85,6 @@ const SharedApps = () => {
       console.error("Create failed:", err);
     }
   };
-  
 
   useEffect(() => {
     fetchSharedApps();
@@ -102,7 +115,6 @@ const SharedApps = () => {
       console.error("Delete failed:", err);
     }
   };
-  
 
   const openEditModal = (app) => {
     setEditingApp(app);
@@ -120,20 +132,17 @@ const SharedApps = () => {
   const updateSharedApp = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axiosInstance.put(
-        `/api/sharedApps/${editingApp._id}`,
-        {
-          sharedData: updatedData,
-        },
-
+      const res = await axiosInstance.put(`/api/sharedApps/${editingApp._id}`, {
+        sharedData: updatedData,
+      });
+      dispatch(
+        updateSharedAppLocal({ ...editingApp, sharedData: updatedData })
       );
-      dispatch(updateSharedAppLocal({ ...editingApp, sharedData: updatedData }));
       setShowModal(false);
     } catch (err) {
       console.error("Update failed:", err);
     }
   };
-  
 
   return (
     <div
@@ -177,6 +186,21 @@ const SharedApps = () => {
             >
               {app.appName}
             </h2>
+            <p className="mt-3 font-medium">
+              Data Risk Score:{"  "}
+              <span
+                className={
+                  calculateRiskScore(app.sharedData) >= 70
+                    ? "text-red-500"
+                    : calculateRiskScore(app.sharedData) >= 40
+                    ? "text-yellow-500"
+                    : "text-green-500"
+                }
+              >
+                {calculateRiskScore(app.sharedData)} / 100
+              </span>
+            </p>
+
             <div className="text-sm space-y-1">
               {Object.entries(app.sharedData).map(([key, value]) => (
                 <p key={key}>

@@ -43,7 +43,7 @@ const handelOTPverification = async (otp, email, navigate , dispatch) => {
                 dispatch(setUser(res.data.user)); 
 
                 setTimeout(() => {
-                    navigate("/dashboard");
+                    navigate("/password-strength-checker");
                 }, 3000);
             }
         })
