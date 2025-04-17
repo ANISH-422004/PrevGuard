@@ -12,7 +12,6 @@ const BlogPage = () => {
 
   const darkTheme = useSelector((state) => state.theme.darkTheme); // 'light' or 'dark'
 
-  console.log(darkTheme)
 
   return (
     <div
