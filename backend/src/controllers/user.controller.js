@@ -1,6 +1,6 @@
-const { uploadBufferStream } = require("../utils/imageKit");
+const { uploadBufferStream  , deleteImage  } = require("../utils/imageKit");
 const userModel = require("../models/user.model");
-const ImageKit = require("imagekit");
+
 
 
 
@@ -9,9 +9,10 @@ module.exports.getUserById = async (req, res) => {
     try {
         const userId = req.params.id;
         const user = await userModel.findById(userId)
-            .select("-password -__v")
+            .select("-password -vaultPassword -__v")
             .populate("savedFakeData")
             .populate("sharedData")
+            
             
 
         if (!user) {
@@ -43,7 +44,7 @@ module.exports.updateUserProfile = async (req, res) => {
         const DEFAULT_PROFILE_URL = "https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg";
   
         if (user.profilePicture !== DEFAULT_PROFILE_URL && user.imageKitFileId) { // for 2nd or more time update 
-          await ImageKit.deleteFile(user.imageKitFileId);
+          await deleteImage(user.imageKitFileId);
           console.log("Previous image deleted");
         }
   
@@ -51,8 +52,14 @@ module.exports.updateUserProfile = async (req, res) => {
         updateFields.profilePicture = uploadResult.url;
         updateFields.imageKitFileId = uploadResult.fileId;
       }
+
   
-      const updatedUser = await userModel.findByIdAndUpdate(req.user.id, updateFields, { new: true });
+    const updatedUser = await userModel.findByIdAndUpdate(req.user.id, updateFields, { new: true })
+      .select("-password -vaultPassword -__v")
+      .populate("savedFakeData")
+      .populate("sharedData");
+      //AGGRIGATING ALL THE FIELDS 
+
       res.status(200).json(updatedUser);
     } catch (error) {
       console.error("Update failed:", error);

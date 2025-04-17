@@ -10,12 +10,15 @@ import {
 } from "lucide-react";
 import axiosInstance from "../../config/axios/axios"; // Adjust the import path as necessary
 import LoadingScreen from "../../components/LoadingScreen/LoadingScreen";
+import ProfileEditModal from "../../components/ProfileEditModal/ProfileEditModal";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const u = useSelector((state) => state.user.user); // Assuming you have a Redux store with a user slice
   const darkTheme = useSelector((state) => state.theme.darkTheme); // Assuming you have a Redux store with a theme slice
+  const handleUpdate = (updatedUser) => setUser(updatedUser);
 
   useEffect(() => {
     async function fetchuserData() {
@@ -26,13 +29,13 @@ export default function ProfilePage() {
         .finally(() => setLoading(false));
     }
     fetchuserData();
-  }, [u._id]);
+  }, []);
 
   return loading ? (
     <LoadingScreen />
   ) : (
     <div
-      className={`mx-auto p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 ${
+      className={`mx-auto min-h-screen p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 ${
         darkTheme ? "bg-dark-background text-dark-primaryText" : "bg-light-background text-light-primaryText"
       }`}
     >
@@ -71,6 +74,12 @@ export default function ProfilePage() {
             {user.phoneNumber}
           </p>
         </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          Edit Profile
+        </button>
       </div>
 
       {/* Shared Apps */}
@@ -129,36 +138,7 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Breach Alerts */}
-      {/* <section className="mt-8">
-        <h3 className={`text-lg sm:text-xl font-semibold mb-3 sm:mb-4 ${darkTheme ? "text-dark-primaryText" : "text-light-primaryText"}`}>
-          Breach Alerts
-        </h3>
-        <div className="space-y-4">
-          {user.breachAlerts?.map((alert) => (
-            <div
-              key={alert._id}
-              className={`p-3 sm:p-4 rounded-md sm:rounded-xl shadow-sm border ${
-                darkTheme ? "border-red-600" : "border-red-300"
-              } ${darkTheme ? "bg-dark-secondary" : "bg-light-secondary"}`}
-            >
-              <p className={`font-semibold text-red-600 dark:text-red-400 text-sm sm:text-base`}>
-                {alert.email}
-              </p>
-              <ul className="list-disc list-inside mt-2 text-xs sm:text-sm space-y-1">
-                {alert.breaches?.map((breach) => (
-                  <li key={breach._id}>
-                    <strong>{breach.source}</strong> — {breach.type} <br />
-                    <span className={`${darkTheme ? "text-dark-secondaryText" : "text-light-secondaryText"}`}>
-                      {breach.details}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section> */}
+
 
       {/* Fake Data */}
       <section className="mt-6 sm:mt-8">
@@ -196,6 +176,18 @@ export default function ProfilePage() {
           ))}
         </div>
       </section>
+
+
+      {showModal && (
+        <ProfileEditModal
+          user={user}
+          onClose={() => setShowModal(false)}
+          onUpdate={handleUpdate}
+        />
+      )}
+
+
+
     </div>
   );
 }
