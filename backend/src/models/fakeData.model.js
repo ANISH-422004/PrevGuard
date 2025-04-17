@@ -1,4 +1,3 @@
-// models/fakeData.model.js
 const mongoose = require("mongoose");
 
 const FakeDataSchema = new mongoose.Schema({
@@ -8,8 +7,6 @@ const FakeDataSchema = new mongoose.Schema({
     required: true,
   },
   name: String,
-  email: String,
-  emailActive: Boolean,
   phone: String,
   address: String,
   city: String,
@@ -22,5 +19,4 @@ const FakeDataSchema = new mongoose.Schema({
 });
 
 const fakeDataModel = mongoose.model("FakeData", FakeDataSchema);
-
-module.exports = fakeDataModel
+module.exports = fakeDataModel;

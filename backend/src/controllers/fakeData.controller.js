@@ -22,14 +22,13 @@ exports.generateFakeData = async (req, res) => {
         const fakeDataInstance = new fakeDataModel({
             userId,
             name: faker.person.fullName(),
-            email: `${faker.string.alphanumeric(6)}@privguard.me`,
-            emailActive: true,
             phone: faker.phone.number(),
             address: faker.location.streetAddress(),
             city: faker.location.city(),
             state: faker.location.state(),
             aadhar: faker.string.numeric(12),
         });
+
 
         await fakeDataInstance.save();
 
@@ -45,22 +44,22 @@ exports.generateFakeData = async (req, res) => {
 };
 
 exports.getFakeData = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const data = await fakeDataModel.find({ userId }).sort({ createdAt: -1 });
+    try {
+        const userId = req.user._id;
+        const data = await fakeDataModel.find({ userId }).sort({ createdAt: -1 });
 
-    res.status(200).json({fakedata : data});
-  } catch (error) {
-    console.error("Fetch Fake Data Error:", error);
-    res.status(500).json({ error: "Failed to fetch fake data" });
-  }
+        res.status(200).json({ fakedata: data });
+    } catch (error) {
+        console.error("Fetch Fake Data Error:", error);
+        res.status(500).json({ error: "Failed to fetch fake data" });
+    }
 };
 
 
 exports.deleteFakeData = async (req, res) => {
     try {
         const userId = req.user._id;
-        const fakeDataId = req.body.fakeDataId; 
+        const fakeDataId = req.body.fakeDataId;
 
         // Find the fake data entry to delete
         const fakeDataEntry = await fakeDataModel.findOneAndDelete({ _id: fakeDataId, userId });
