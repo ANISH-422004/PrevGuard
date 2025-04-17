@@ -73,12 +73,12 @@ const BreachMonitor = () => {
 
   return (
     <div
-      className={`min-h-screen px-4 sm:px-6 lg:px-16 py-10 bg-${themeClass}-background text-${themeClass}-primaryText transition-all flex flex-col items-center`}
+      className={`min-h-screen px-4 sm:px-6 lg:px-16 py-10 bg-${themeClass}-background text-${themeClass}-primaryText transition-all flex flex-col items-center overflow-x-hidden`}
     >
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-8 text-center">
         🔐 Email Breach Monitor
       </h1>
-
+  
       <div className="w-full max-w-xl flex flex-col sm:flex-row gap-4 mb-10">
         <input
           type="email"
@@ -94,12 +94,12 @@ const BreachMonitor = () => {
           Search
         </button>
       </div>
-
+  
       {loading && <p className="text-sm flex gap-4"><Loading /> Checking breaches...</p>}
       {error && <p className="text-red-500">{error}</p>}
-
+  
       {breachData && (
-        <div className="w-full max-w-4xl space-y-6">
+        <div className="w-full max-w-4xl space-y-6 overflow-hidden">
           {/* Summary Section */}
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">🔍 Summary</h2>
@@ -121,13 +121,13 @@ const BreachMonitor = () => {
               </span>
             </p>
           </div>
-
+  
           {/* Exposed Data Section */}
           <div>
             <h2 className="text-xl font-semibold mb-2">📂 Exposed Data</h2>
             {renderExposedData()}
           </div>
-
+  
           {/* Breaches Section */}
           <div>
             <h2 className="text-xl font-semibold mb-2">📛 Breaches</h2>
@@ -137,6 +137,7 @@ const BreachMonitor = () => {
       )}
     </div>
   );
+  
 };
 
 export default BreachMonitor;
