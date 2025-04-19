@@ -27,6 +27,7 @@ const VaultItemSchema = new mongoose.Schema({
 
   });
 
+  VaultItemSchema.index({ userId: 1 });
 
 const VaultItem = mongoose.model('VaultItem', VaultItemSchema);
 

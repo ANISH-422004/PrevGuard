@@ -52,4 +52,8 @@ const sharedAppSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// 🔥 Indexes
+sharedAppSchema.index({ userId: 1 });
+sharedAppSchema.index({ appName: 1 });
+
 module.exports = mongoose.model("SharedApp", sharedAppSchema);

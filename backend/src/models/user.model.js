@@ -30,6 +30,8 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    isPremium: { type: Boolean, default: false },
+
     profilePicture: {
         type: String,
         default: "https://cdn.vectorstock.com/i/1000v/92/16/default-profile-picture-avatar-user-icon-vector-46389216.jpg",
@@ -66,6 +68,13 @@ const userSchema = new mongoose.Schema({
 
 
 }, { timestamps: true });
+
+//indexes
+userSchema.index({ email: 1 }, { unique: true }); // all  Fields with high update frequency  and  Low query usage
+userSchema.index({ username: 1 });
+userSchema.index({ isPremium: 1 });
+
+
 
 userSchema.statics.generateHashedPassword = (password) => {
     return bcrypt.hashSync(password, 10);

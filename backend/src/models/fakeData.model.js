@@ -18,5 +18,8 @@ const FakeDataSchema = new mongoose.Schema({
   },
 });
 
+FakeDataSchema.index({ userId: 1 });
+
+
 const fakeDataModel = mongoose.model("FakeData", FakeDataSchema);
 module.exports = fakeDataModel;
