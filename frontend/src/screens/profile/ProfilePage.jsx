@@ -161,9 +161,6 @@ export default function ProfilePage() {
                 <strong>Name:</strong> {fake.name}
               </p>
               <p className="text-sm sm:text-base">
-                <strong>Email:</strong> {fake.email}
-              </p>
-              <p className="text-sm sm:text-base">
                 <strong>Phone:</strong> {fake.phone}
               </p>
               <p className="text-sm sm:text-base">
