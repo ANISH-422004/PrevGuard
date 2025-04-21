@@ -12,7 +12,6 @@ const BreachMonitor = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const darkTheme = useSelector((state) => state.theme.darkTheme);
-  console.log(breachData);
 
   const handleSearch = async () => {
     setLoading(true);
