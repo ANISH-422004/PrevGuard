@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import { CheckCircle, AlertTriangle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import Loading from "../../components/Loading";
+import { MdFileDownload } from "react-icons/md";
+import generateBreachPDF from "../../utils/generatePdf";
 
 const BreachMonitor = () => {
   const [email, setEmail] = useState("");
@@ -10,6 +12,7 @@ const BreachMonitor = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const darkTheme = useSelector((state) => state.theme.darkTheme);
+  console.log(breachData);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -29,16 +32,18 @@ const BreachMonitor = () => {
   const themeClass = darkTheme ? "dark" : "light";
 
   const renderExposedData = () => {
-    return breachData?.BreachMetrics?.xposed_data[0]?.children.map((category, i) => (
-      <div key={i} className="mb-3">
-        <h4 className="font-semibold text-md">{category.name}</h4>
-        <ul className="list-disc list-inside ml-4 text-sm">
-          {category.children.map((item, j) => (
-            <li key={j}>{item.name.replace("data_", "")}</li>
-          ))}
-        </ul>
-      </div>
-    ));
+    return breachData?.BreachMetrics?.xposed_data[0]?.children.map(
+      (category, i) => (
+        <div key={i} className="mb-3">
+          <h4 className="font-semibold text-md">{category.name}</h4>
+          <ul className="list-disc list-inside ml-4 text-sm">
+            {category.children.map((item, j) => (
+              <li key={j}>{item.name.replace("data_", "")}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    );
   };
 
   const renderBreaches = () => {
@@ -52,13 +57,29 @@ const BreachMonitor = () => {
           <AlertTriangle className="w-5 h-5" />
           Breach Detected
         </div>
-        <img src={breach.logo} alt={breach.breach} className="w-20 h-auto mb-3" />
-        <p><strong>📛 Breach:</strong> {breach.breach}</p>
-        <p><strong>🧠 Industry:</strong> {breach.industry}</p>
-        <p><strong>📅 Year:</strong> {breach.xposed_date}</p>
-        <p><strong>🧾 Records:</strong> {breach.xposed_records.toLocaleString()}</p>
-        <p><strong>🔐 Exposed:</strong> {breach.xposed_data}</p>
-        <p><strong>📖 Details:</strong> {breach.details}</p>
+        <img
+          src={breach.logo}
+          alt={breach.breach}
+          className="w-20 h-auto mb-3"
+        />
+        <p>
+          <strong>📛 Breach:</strong> {breach.breach}
+        </p>
+        <p>
+          <strong>🧠 Industry:</strong> {breach.industry}
+        </p>
+        <p>
+          <strong>📅 Year:</strong> {breach.xposed_date}
+        </p>
+        <p>
+          <strong>🧾 Records:</strong> {breach.xposed_records.toLocaleString()}
+        </p>
+        <p>
+          <strong>🔐 Exposed:</strong> {breach.xposed_data}
+        </p>
+        <p>
+          <strong>📖 Details:</strong> {breach.details}
+        </p>
         <a
           href={breach.references}
           target="_blank"
@@ -78,7 +99,7 @@ const BreachMonitor = () => {
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-8 text-center">
         🔐 Email Breach Monitor
       </h1>
-  
+
       <div className="w-full max-w-xl flex flex-col sm:flex-row gap-4 mb-10">
         <input
           type="email"
@@ -94,10 +115,14 @@ const BreachMonitor = () => {
           Search
         </button>
       </div>
-  
-      {loading && <p className="text-sm flex gap-4"><Loading /> Checking breaches...</p>}
+
+      {loading && (
+        <p className="text-sm flex gap-4">
+          <Loading /> Checking breaches...
+        </p>
+      )}
       {error && <p className="text-red-500">{error}</p>}
-  
+
       {breachData && (
         <div className="w-full max-w-4xl space-y-6 overflow-hidden">
           {/* Summary Section */}
@@ -105,29 +130,48 @@ const BreachMonitor = () => {
             <h2 className="text-xl font-semibold mb-2">🔍 Summary</h2>
             <p>
               Breach Site:{" "}
-              <span className="font-medium">{breachData.BreachesSummary?.site}</span>
+              <span className="font-medium">
+                {breachData.BreachesSummary?.site?.split(";").join(", ")}
+              </span>
             </p>
-            <p>
+            <p className=" text-red-400">
               Overall Risk:{" "}
               <span className="font-medium">
                 {breachData.BreachMetrics?.risk[0]?.risk_label} (
                 {breachData.BreachMetrics?.risk[0]?.risk_score})
               </span>
             </p>
-            <p>
+            <p className=" text-red-500">
               Weak Passwords:{" "}
               <span className="font-medium">
                 {breachData.BreachMetrics?.passwords_strength[0]?.EasyToCrack}
               </span>
             </p>
+
+            <div className="flex justify-center items-center gap-2 mt-4">
+              <button
+                onClick={() => {
+                  generateBreachPDF(
+                    breachData.ExposedBreaches.breaches_details,
+                    email
+                  );
+                }}
+                className={`flex justify-center items-center gap-2  px-6 py-2 rounded-lg text-white bg-${themeClass}-action hover:bg-${themeClass}-hover transition-all`}
+              >
+                <span>
+                  <MdFileDownload />
+                </span>{" "}
+                Import
+              </button>
+            </div>
           </div>
-  
+
           {/* Exposed Data Section */}
           <div>
             <h2 className="text-xl font-semibold mb-2">📂 Exposed Data</h2>
             {renderExposedData()}
           </div>
-  
+
           {/* Breaches Section */}
           <div>
             <h2 className="text-xl font-semibold mb-2">📛 Breaches</h2>
@@ -137,7 +181,6 @@ const BreachMonitor = () => {
       )}
     </div>
   );
-  
 };
 
 export default BreachMonitor;
