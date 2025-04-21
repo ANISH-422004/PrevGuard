@@ -1,6 +1,10 @@
 import jsPDF from 'jspdf';
 
 const generateBreachPDF = (breachDetails, email) => {
+    if (!breachDetails || breachDetails.length === 0) {
+        alert('No breach details available to generate PDF.');
+        return;
+    }
   const pdf = new jsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();

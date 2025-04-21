@@ -130,20 +130,20 @@ const BreachMonitor = () => {
             <p>
               Breach Site:{" "}
               <span className="font-medium">
-                {breachData.BreachesSummary?.site?.split(";").join(", ")}
+                {breachData.BreachesSummary?.site?.split(";").join(", ") || "None"}
               </span>
             </p>
             <p className=" text-red-400">
               Overall Risk:{" "}
               <span className="font-medium">
                 {breachData.BreachMetrics?.risk[0]?.risk_label} (
-                {breachData.BreachMetrics?.risk[0]?.risk_score})
+                {breachData.BreachMetrics?.risk[0]?.risk_score || "0"})
               </span>
             </p>
             <p className=" text-red-500">
               Weak Passwords:{" "}
               <span className="font-medium">
-                {breachData.BreachMetrics?.passwords_strength[0]?.EasyToCrack}
+                {breachData.BreachMetrics?.passwords_strength[0]?.EasyToCrack || "0"}
               </span>
             </p>
 
@@ -151,7 +151,7 @@ const BreachMonitor = () => {
               <button
                 onClick={() => {
                   generateBreachPDF(
-                    breachData.ExposedBreaches.breaches_details,
+                    breachData.ExposedBreaches?.breaches_details,
                     email
                   );
                 }}
