@@ -19,6 +19,24 @@ const PasswordBreachCheck = () => {
   const [loading, setLoading] = useState(false);
   const strength = zxcvbn(password);
 
+  const secondsToReadableTime = (seconds) => {
+    if (seconds < 60) {
+      return `${Math.round(seconds)} seconds`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      return `${minutes} minutes`;
+    } else if (seconds < 86400) {
+      const hours = Math.floor(seconds / 3600);
+      return `${hours} hours`;
+    } else if (seconds < 31536000) {
+      const days = Math.floor(seconds / 86400);
+      return `${days} days`;
+    } else {
+      const years = seconds / 31536000;
+      return `${years.toFixed(1)} years`;
+    }
+  };
+
   const checkPassword = async () => {
     if (!password) {
       setBreachCount(0); // Set breach count to 0 if password is empty
@@ -54,12 +72,10 @@ const PasswordBreachCheck = () => {
     setLoading(false);
   };
 
-  // Function to get password strength label
   const getStrengthLabel = (score) => {
     return ["Very Weak", "Weak", "Fair", "Strong", "Very Strong"][score];
   };
 
-  // Chart data for password strength
   const chartData = [
     {
       name: "Crack Time (online)",
@@ -67,7 +83,10 @@ const PasswordBreachCheck = () => {
         ? Math.log10(
             strength.crack_times_seconds.online_no_throttling_10_per_second
           )
-        : 0, // Default to 0 if password is empty
+        : 0,
+      rawCrackTime: password
+        ? strength.crack_times_seconds.online_no_throttling_10_per_second
+        : 0, // Store raw value for tooltip
     },
     {
       name: "Crack Time (offline)",
@@ -76,18 +95,22 @@ const PasswordBreachCheck = () => {
             strength.crack_times_seconds.offline_slow_hashing_1e4_per_second
           )
         : 0,
+      rawCrackTime: password
+        ? strength.crack_times_seconds.offline_slow_hashing_1e4_per_second
+        : 0, // Store raw value for tooltip
     },
     {
       name: "Entropy",
       value: password ? strength.entropy : 0,
+      rawEntropy: password ? strength.entropy : 0, // Optional: Store raw entropy if needed
     },
     {
       name: "Strength Score",
       value: password ? strength.score + 1 : 0,
+      rawScore: password ? strength.score + 1 : 0, // Optional: Store raw score if needed
     },
   ];
 
-  // Password Strength Tips
   const passwordTips = [
     "Use a mix of upper and lowercase letters, numbers, and special characters.",
     "Avoid using easily guessable information like names, birthdays, or common words.",
@@ -155,11 +178,8 @@ const PasswordBreachCheck = () => {
           </div>
         )}
 
-        {/* Split Section: Left (Strength + Tips) | Right (Analytics Chart) */}
         <div className="mt-8 flex flex-col md:flex-row gap-8">
-          {/* Left Side */}
           <div className="md:w-1/2 space-y-6">
-            {/* Strength Indicator */}
             <div>
               <h2 className="text-xl font-semibold">🔒 Password Strength</h2>
               <div className="text-sm mt-1">
@@ -182,7 +202,6 @@ const PasswordBreachCheck = () => {
               </div>
             </div>
 
-            {/* Tips */}
             <div>
               <h2 className="text-xl font-semibold">💡 Password Tips</h2>
               <ul className="mt-3 space-y-2 text-sm">
@@ -195,7 +214,6 @@ const PasswordBreachCheck = () => {
             </div>
           </div>
 
-          {/* Right Side: Chart */}
           <div className="md:w-1/2">
             <h2 className="text-xl font-semibold text-center md:text-left">
               📊 Password Analytics
@@ -204,7 +222,17 @@ const PasswordBreachCheck = () => {
               <BarChart data={chartData}>
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value, name, props) => {
+                    if (props.dataKey.startsWith("Crack Time")) {
+                      return [
+                        secondsToReadableTime(props.payload.rawCrackTime),
+                        name,
+                      ];
+                    }
+                    return [value, name];
+                  }}
+                />
                 <Bar dataKey="value" fill="#8884d8" />
               </BarChart>
             </ResponsiveContainer>
