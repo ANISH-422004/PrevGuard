@@ -35,7 +35,7 @@ export default function ProfilePage() {
     <LoadingScreen />
   ) : (
     <div
-      className={`mx-auto min-h-screen p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 ${
+      className={`mx-auto min-h-screen  py-14 p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 ${
         darkTheme ? "bg-dark-background text-dark-primaryText" : "bg-light-background text-light-primaryText"
       }`}
     >

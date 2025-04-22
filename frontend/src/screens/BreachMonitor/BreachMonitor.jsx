@@ -93,7 +93,7 @@ const BreachMonitor = () => {
 
   return (
     <div
-      className={`min-h-screen px-4 sm:px-6 lg:px-16 py-10 bg-${themeClass}-background text-${themeClass}-primaryText transition-all flex flex-col items-center overflow-x-hidden`}
+      className={`min-h-screen px-4 sm:px-6 lg:px-16 py-24 bg-${themeClass}-background text-${themeClass}-primaryText transition-all flex flex-col items-center overflow-x-hidden`}
     >
       <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-8 text-center">
         🔐 Email Breach Monitor

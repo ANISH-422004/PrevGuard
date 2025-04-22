@@ -132,7 +132,7 @@ const Fakedata = () => {
 
   return (
     <div
-      className={`min-h-screen px-4 py-10 ${
+      className={`min-h-screen px-4 py-24 ${
         darkTheme
           ? "bg-dark-background text-dark-primaryText"
           : "bg-light-background text-light-primaryText"

@@ -9,12 +9,42 @@ import { useDispatch, useSelector } from "react-redux";
 import axiosInstance from "../../config/axios/axios";
 import { setUser } from "../../app/slices/userSlice";
 import { motion } from "framer-motion";
+import clsx from "clsx"; // Optional, for cleaner conditional classes
 
 const NavBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const user = useSelector((state) => state.user.user);
   const { darkTheme } = useSelector((state) => state.theme);
   const dispatch = useDispatch();
+  //for Disappearing navBar
+  const [show, setShow] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [timeoutId, setTimeoutId] = useState(null);
+
+  const controlNavbar = () => {
+    const currentScrollY = window.scrollY;
+
+    if (currentScrollY > lastScrollY) {
+      // Scrolling down - hide navbar
+      setShow(false);
+      clearTimeout(timeoutId);
+    } else {
+      // Scrolling up - delay showing navbar
+      clearTimeout(timeoutId);
+      const id = setTimeout(() => setShow(true), 200); // Delay in ms
+      setTimeoutId(id);
+    }
+
+    setLastScrollY(currentScrollY);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", controlNavbar);
+    return () => {
+      window.removeEventListener("scroll", controlNavbar);
+      clearTimeout(timeoutId);
+    };
+  }, [lastScrollY]);
 
   useEffect(() => {
     const isUserLoggedIn = async () => {
@@ -80,10 +110,15 @@ const NavBar = () => {
   return (
     <>
       <motion.nav
-        className="top-0 left-0 w-full bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-lg shadow-md flex justify-between items-center px-3 py-2 md:px-4 md:py-3 lg:p-4 z-50"
-        initial="hidden"
-        animate="visible"
-        variants={navbarVariants}
+        className="fixed top-0 left-0 w-full bg-light-background/80 dark:bg-dark-background/80 backdrop-blur-lg shadow-md flex justify-between items-center px-3 py-2 md:px-4 md:py-3 lg:p-4 z-50 border-b border-light-border dark:border-dark-border "
+        initial={{ y: 0, opacity: 1 }}
+        animate={show ? { y: 0, opacity: 1 } : { y: -100, opacity: 0 }}
+        transition={{
+          type: "spring",
+          stiffness: 120,
+          damping: 20,
+          duration: 0.3,
+        }}
       >
         {/* Left Section */}
         <div className="flex items-center gap-2 md:gap-4">
@@ -121,8 +156,15 @@ const NavBar = () => {
         </motion.div>
 
         {/* Right Section */}
-        <motion.div className="flex items-center gap-2 md:gap-4" variants={itemVariants}>
-          <motion.div variants={itemVariants} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+        <motion.div
+          className="flex items-center gap-2 md:gap-4"
+          variants={itemVariants}
+        >
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <ThemeButton />
           </motion.div>
 
@@ -140,14 +182,20 @@ const NavBar = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   whileHover={{
-                    boxShadow: `0 0 8px ${darkTheme ? '#A66CFF' : '#874CCC'}`
+                    boxShadow: `0 0 8px ${darkTheme ? "#A66CFF" : "#874CCC"}`,
                   }}
                 />
               </Link>
             </motion.div>
           ) : (
-            <motion.div className="flex gap-2 items-center" variants={itemVariants}>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div
+              className="flex gap-2 items-center"
+              variants={itemVariants}
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Link
                   to="/register"
                   className="text-xs md:text-sm text-light-primaryText dark:text-dark-primaryText hover:text-light-accent dark:hover:text-dark-accent mt-1 transition"
@@ -156,7 +204,11 @@ const NavBar = () => {
                 </Link>
               </motion.div>
               <motion.div
-                whileHover={{ scale: 1.1, rotate: 5, transition: { duration: 0.2 } }}
+                whileHover={{
+                  scale: 1.1,
+                  rotate: 5,
+                  transition: { duration: 0.2 },
+                }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Link to="/login">
