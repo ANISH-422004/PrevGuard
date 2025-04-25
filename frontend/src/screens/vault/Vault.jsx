@@ -28,7 +28,7 @@ const Vault = () => {
     const checkVaultStatus = async () => {
       try {
         const res = await axiosInstance.get(
-          "http://localhost:3000/api/vault/isInitialized"
+          "/api/vault/isInitialized"
         );
         const user = res.data;
         dispatch(setVaultUnlocked(user.isInitialized));

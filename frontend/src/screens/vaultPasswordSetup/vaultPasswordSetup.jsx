@@ -14,7 +14,7 @@ const VaultPasswordSetup = () => {
     e.preventDefault();
 
     try {
-      await axiosInstance.post('http://localhost:3000/api/vault/createvaultPassword', { password });
+      await axiosInstance.post('/api/vault/createvaultPassword', { password });
       setCreated(true);
       toast.success('Vault password created successfully 🎉');
       navigate("/vault")
