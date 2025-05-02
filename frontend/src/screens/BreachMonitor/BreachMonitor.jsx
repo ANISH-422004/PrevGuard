@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import { AlertTriangle } from "lucide-react";
 import Loading from "../../components/Loading";
 import { MdFileDownload } from "react-icons/md";
 import generateBreachPDF from "../../utils/generatePdf";
+import axiosInstance from "../../config/axios/axios";
 
 const BreachMonitor = () => {
   const [email, setEmail] = useState("");
@@ -17,11 +17,13 @@ const BreachMonitor = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await axios.get(
-        `https://api.xposedornot.com/v1/breach-analytics?email=${email}`
+      const res = await axiosInstance.get(
+        `/api/breaches/proxy-breach?email=${email}`
       );
+      console.log(res.data)
       setBreachData(res.data);
     } catch (err) {
+      console.log(err);
       setError("Could not fetch breach info");
     } finally {
       setLoading(false);
