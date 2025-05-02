@@ -15,7 +15,7 @@ const BlogPage = () => {
 
   return (
     <div
-      className={`p-4 md:p-6 space-y-4 md:space-y-6 min-h-screen transition-all duration-300 ${
+      className={`p-4 md:px-6 md:py-24 space-y-4 md:space-y-6 min-h-screen transition-all duration-300 ${
         darkTheme ? "bg-dark-background text-dark-primaryText" : "bg-light-background text-light-primaryText"
       }`}
     >

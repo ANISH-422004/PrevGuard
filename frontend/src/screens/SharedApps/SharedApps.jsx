@@ -146,7 +146,7 @@ const SharedApps = () => {
 
   return (
     <div
-      className={`min-h-screen px-4 py-14 ${
+      className={`min-h-screen px-4 py-24 ${
         darkTheme
           ? "bg-dark-background text-dark-primaryText"
           : "bg-light-background text-light-primaryText"
