@@ -9,6 +9,7 @@ const vaultRoutes = require('./routes/vault.routes');
 const fakeDataRoutes = require("./routes/fakeData.routes");
 const sharedDataRoutes = require("./routes/sharedData.routes");
 const blogRoutes = require("./routes/blog.routes");
+const config = require('./config/config');
 
 
 // Middleware
@@ -16,7 +17,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: config.FRONTEND_URL,
 }));
 
 
