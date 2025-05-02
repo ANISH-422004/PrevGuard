@@ -9,7 +9,9 @@ const vaultRoutes = require('./routes/vault.routes');
 const fakeDataRoutes = require("./routes/fakeData.routes");
 const sharedDataRoutes = require("./routes/sharedData.routes");
 const blogRoutes = require("./routes/blog.routes");
+const breachRoutes = require('./routes/breaches.routes');
 const config = require('./config/config');
+
 
 
 // Middleware
@@ -19,7 +21,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin  : config.FRONTEND_URL
 }));
-
 
 // Routes
 app.get('/', (req, res) => {
@@ -37,6 +38,7 @@ app.use('/api/vault', vaultRoutes);
 app.use("/api/fake-data", fakeDataRoutes);
 app.use("/api/sharedApps", sharedDataRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use('/api/breaches', breachRoutes);
 
 
 

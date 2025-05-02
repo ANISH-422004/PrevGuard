@@ -70,7 +70,6 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 //indexes
-userSchema.index({ email: 1 }, { unique: true }); // all  Fields with high update frequency  and  Low query usage
 userSchema.index({ username: 1 });
 userSchema.index({ isPremium: 1 });
 
