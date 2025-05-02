@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { VITE_API_URL } from '../../utils/constants';
 
 const token = localStorage.getItem('token');
 
