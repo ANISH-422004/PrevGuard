@@ -16,7 +16,9 @@ const config = require('./config/config');
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin  : config.FRONTEND_URL
+}));
 
 
 // Routes
