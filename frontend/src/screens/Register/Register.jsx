@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PasswordStrength from "./Register componets/PasswordStrength";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import axiosInstance from "../../config/axios/axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -215,9 +215,9 @@ const Register = () => {
         </form>
         <p className={`mt-4 text-center ${darkTheme ? "text-[#E3DFFD]" : "text-[#241847]"}`}>
           Already have an account?{" "}
-          <a href="/login" className={darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}>
+          <Link  to="/login" className={darkTheme ? "text-[#874CCC]" : "text-[#874CCC]"}>
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

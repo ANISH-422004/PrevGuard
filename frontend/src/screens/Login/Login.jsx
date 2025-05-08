@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import axiosInstance from "../../config/axios/axios";
@@ -95,9 +95,9 @@ const Login = () => {
 
         <p className="mt-4 text-center">
           Don't have an account?{" "}
-          <a href="/register" className="underline hover:opacity-75">
+          <Link to="/register" className="underline hover:opacity-75">
             Sign up
-          </a>
+          </Link>
         </p>
       </div>
     </div>
